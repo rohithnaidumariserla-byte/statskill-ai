@@ -1,9 +1,8 @@
-/// <reference types="vite/client" />
 import { User, Skill, UserSkill, CourseRecommendation, NSSTAProgramme, Quiz, QuizAttempt, AdminQuizStats, GapAnalysisReport, NotificationItem, BankQuestion, BankStats } from '../types';
 
-// Dynamic API Base URL: supports production Vercel deployment with VITE_API_URL or local proxy fallback
-const getApiBase = () => {
-  const envUrl = (import.meta as any).env?.VITE_API_URL;
+// Dynamic API Base URL: supports production Vercel/Render deployment with VITE_API_URL or local proxy fallback
+const getApiBase = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
     return `${envUrl.trim().replace(/\/+$/, '')}/api`;
   }

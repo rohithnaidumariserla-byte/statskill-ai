@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
-import { Bell, User as UserIcon, Shield, ChevronDown, Award, LogOut, RefreshCw, BookOpen, Layers } from 'lucide-react';
+import { Bell, User as UserIcon, Shield, ChevronDown, Award, LogOut, RefreshCw, BookOpen, Layers, Menu } from 'lucide-react';
 
 export const Header: React.FC<{ activeTab: string; setActiveTab: (tab: string) => void; toggleMobileMenu: () => void }> = ({
   activeTab,
@@ -81,27 +81,37 @@ export const Header: React.FC<{ activeTab: string; setActiveTab: (tab: string) =
       {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left: Emblem & Brand */}
-          <div
-            className="flex items-center space-x-3 cursor-pointer"
-            onClick={() => setActiveTab(role === 'admin' ? 'admin-dashboard' : 'dashboard')}
-          >
-            {/* National Emblem & Crest */}
-            <div className="w-10 h-10 rounded-lg bg-gov-navy flex items-center justify-center text-white shadow-md">
-              <svg className="w-6 h-6 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.8L4.2 7 12 3.1 19.8 7 12 11.8zM2 17l10 5 10-5v-2l-10 5-10-5v2z"/>
-              </svg>
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold text-gov-navy tracking-tight">StatSkill AI</span>
-                <span className="bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded border border-orange-200 uppercase tracking-wider">
-                  SIH Prototype
-                </span>
+          {/* Left: Hamburger & Brand */}
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={toggleMobileMenu}
+              aria-label="Open Navigation Menu"
+              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div
+              className="flex items-center space-x-3 cursor-pointer"
+              onClick={() => setActiveTab(role === 'admin' ? 'admin-dashboard' : 'dashboard')}
+            >
+              {/* National Emblem & Crest */}
+              <div className="w-10 h-10 rounded-lg bg-gov-navy flex items-center justify-center text-white shadow-md">
+                <svg className="w-6 h-6 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.8L4.2 7 12 3.1 19.8 7 12 11.8zM2 17l10 5 10-5v-2l-10 5-10-5v2z"/>
+                </svg>
               </div>
-              <p className="text-[11px] font-medium text-slate-500">
-                सांख्यिकी कौशल एआई • Official Statistical System of India
-              </p>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-lg font-bold text-gov-navy tracking-tight">StatSkill AI</span>
+                  <span className="bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded border border-orange-200 uppercase tracking-wider">
+                    SIH Prototype
+                  </span>
+                </div>
+                <p className="text-[11px] font-medium text-slate-500 hidden sm:block">
+                  सांख्यिकी कौशल एआई • Official Statistical System of India
+                </p>
+              </div>
             </div>
           </div>
 

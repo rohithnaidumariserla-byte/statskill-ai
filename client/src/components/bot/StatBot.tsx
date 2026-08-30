@@ -77,6 +77,17 @@ export const StatBot: React.FC<{ onNavigate?: (tab: string) => void }> = ({ onNa
     if (isOpen) scrollToBottom();
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    const handleOpenBot = (e: any) => {
+      setIsOpen(true);
+      if (e?.detail?.prompt) {
+        handleSend(e.detail.prompt);
+      }
+    };
+    window.addEventListener('statskill:open-bot', handleOpenBot);
+    return () => window.removeEventListener('statskill:open-bot', handleOpenBot);
+  }, [messages, sessionState, user]);
+
   const handleSend = async (textToSend?: string) => {
     const text = textToSend || input;
     if (!text.trim()) return;

@@ -130,11 +130,14 @@ export const OfficialDashboard: React.FC<{ onNavigate: (tab: string) => void }> 
       {/* 1. YOUR WORKFORCE SKILL PROFILE STRIP */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Overall Competency Card */}
-        <div className="gov-card p-4 border-l-4 border-l-gov-navy flex items-center justify-between">
+        <div
+          onClick={() => onNavigate('profile')}
+          className="gov-card p-4 border-l-4 border-l-gov-navy flex items-center justify-between cursor-pointer hover:border-l-blue-800 transition"
+        >
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Overall Competency</span>
             <span className="text-2xl font-black text-gov-navy mt-0.5 block">{overallScore}%</span>
-            <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">{prof.label} Level</span>
+            <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">{prof.label} Level →</span>
           </div>
           <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-700 font-bold">
             <Award className="w-6 h-6" />

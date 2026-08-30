@@ -122,60 +122,81 @@ export const AdminDashboard: React.FC<{ onNavigate: (tab: string) => void }> = (
 
       {/* 1. SEVEN WORKFORCE HEADLINE SUMMARY CARDS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-        <div className="gov-card p-4 border-l-4 border-l-gov-navy">
+        <div
+          onClick={() => onNavigate('admin-gaps')}
+          className="gov-card p-4 border-l-4 border-l-gov-navy cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Officials</span>
           <span className="text-xl font-black text-slate-800 mt-1 block">
             {overview.totalOfficials ? overview.totalOfficials.toLocaleString() : '12,450'}
           </span>
-          <span className="text-[10px] text-slate-500 block mt-0.5">Across 4 cadres</span>
+          <span className="text-[10px] text-slate-500 block mt-0.5">Across 4 cadres →</span>
         </div>
 
-        <div className="gov-card p-4 border-l-4 border-l-blue-600">
+        <div
+          onClick={() => onNavigate('admin-gaps')}
+          className="gov-card p-4 border-l-4 border-l-blue-600 cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Officials Assessed</span>
           <span className="text-xl font-black text-blue-700 mt-1 block">
             {overview.officialsAssessed ? overview.officialsAssessed.toLocaleString() : '10,820'}
           </span>
-          <span className="text-[10px] text-blue-600 font-semibold block mt-0.5">87% participation</span>
+          <span className="text-[10px] text-blue-600 font-semibold block mt-0.5">87% participation →</span>
         </div>
 
-        <div className="gov-card p-4 border-l-4 border-l-emerald-600">
+        <div
+          onClick={() => onNavigate('admin-framework')}
+          className="gov-card p-4 border-l-4 border-l-emerald-600 cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Avg Competency</span>
           <span className="text-xl font-black text-emerald-700 mt-1 block">
             {overview.averageCompetency || 68}%
           </span>
-          <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">Target: 75%</span>
+          <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">Target: 75% →</span>
         </div>
 
-        <div className="gov-card p-4 border-l-4 border-l-red-500">
+        <div
+          onClick={() => onNavigate('admin-gaps')}
+          className="gov-card p-4 border-l-4 border-l-red-500 cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Req. Upskilling</span>
           <span className="text-xl font-black text-red-600 mt-1 block">
             {overview.officialsRequiringUpskilling ? overview.officialsRequiringUpskilling.toLocaleString() : '3,840'}
           </span>
-          <span className="text-[10px] text-red-500 font-semibold block mt-0.5">Priority focus</span>
+          <span className="text-[10px] text-red-500 font-semibold block mt-0.5">Priority focus →</span>
         </div>
 
-        <div className="gov-card p-4 border-l-4 border-l-amber-500">
+        <div
+          onClick={() => onNavigate('admin-gaps')}
+          className="gov-card p-4 border-l-4 border-l-amber-500 cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Critical Gaps</span>
           <span className="text-xl font-black text-amber-600 mt-1 block">
             {overview.criticalSkillGapsCount || 4}
           </span>
-          <span className="text-[10px] text-amber-600 font-semibold block mt-0.5">High-priority</span>
+          <span className="text-[10px] text-amber-600 font-semibold block mt-0.5">High-priority →</span>
         </div>
 
-        <div className="gov-card p-4 border-l-4 border-l-indigo-500">
+        <div
+          onClick={() => onNavigate('admin-quiz-management')}
+          className="gov-card p-4 border-l-4 border-l-indigo-500 cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Active Exams</span>
           <span className="text-xl font-black text-indigo-600 mt-1 block">
             {overview.activeAssessments || 3}
           </span>
-          <span className="text-[10px] text-indigo-500 font-semibold block mt-0.5">Underway now</span>
+          <span className="text-[10px] text-indigo-500 font-semibold block mt-0.5">Underway now →</span>
         </div>
 
-        <div className="gov-card p-4 border-l-4 border-l-purple-600">
+        <div
+          onClick={() => onNavigate('admin-resources')}
+          className="gov-card p-4 border-l-4 border-l-purple-600 cursor-pointer hover:shadow-md transition"
+        >
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Courses Completed</span>
           <span className="text-xl font-black text-purple-700 mt-1 block">
             {overview.coursesCompleted ? overview.coursesCompleted.toLocaleString() : '78,420'}
           </span>
-          <span className="text-[10px] text-purple-600 font-semibold block mt-0.5">78% Completion Rate</span>
+          <span className="text-[10px] text-purple-600 font-semibold block mt-0.5">78% Completion →</span>
         </div>
       </div>
 

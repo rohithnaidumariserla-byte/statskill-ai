@@ -33,11 +33,12 @@ export const AppContent: React.FC = () => {
   const { user, role, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<string>(role === 'admin' ? 'admin-dashboard' : 'dashboard');
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Immediate Reactive Portal & Route Synchronization upon Role Change
   useEffect(() => {
     if (role === 'admin') {
-      if (!activeTab.startsWith('admin-') && activeTab !== 'courses' && activeTab !== 'nssta') {
+      if (!activeTab.startsWith('admin-') && activeTab !== 'courses' && activeTab !== 'nssta' && activeTab !== 'profile' && activeTab !== 'notifications' && activeTab !== 'statbot') {
         setActiveTab('admin-dashboard');
       }
     } else {
@@ -57,6 +58,11 @@ export const AppContent: React.FC = () => {
   }
 
   const handleTabChange = (newTab: string) => {
+    setMobileMenuOpen(false);
+    if (newTab === 'statbot') {
+      window.dispatchEvent(new CustomEvent('statskill:open-bot'));
+      return;
+    }
     if (activeTab === 'take-quiz' && newTab !== 'take-quiz') {
       window.dispatchEvent(new CustomEvent('statskill:navigate-away', { detail: { newTab } }));
       setTimeout(() => setActiveTab(newTab), 250);
@@ -84,6 +90,8 @@ export const AppContent: React.FC = () => {
       if (activeTab === 'admin-generator') return <AiQuizGenerator onNavigate={handleTabChange} />;
       if (activeTab === 'courses') return <CourseCatalogue />;
       if (activeTab === 'nssta') return <NsstaProgrammes />;
+      if (activeTab === 'profile') return <OfficialProfile onStartAssessment={() => handleTabChange('admin-generator')} onNavigate={handleTabChange} />;
+      if (activeTab === 'notifications') return <NotificationsPage onNavigate={handleTabChange} />;
 
       // Fallback to Admin Dashboard
       return <AdminDashboard onNavigate={handleTabChange} />;
@@ -91,7 +99,7 @@ export const AppContent: React.FC = () => {
 
     // Official Portal Pages (role === 'official')
     if (activeTab === 'dashboard') return <OfficialDashboard onNavigate={handleTabChange} />;
-    if (activeTab === 'profile') return <OfficialProfile onStartAssessment={() => handleTabChange('assessment')} />;
+    if (activeTab === 'profile') return <OfficialProfile onStartAssessment={() => handleTabChange('assessment')} onNavigate={handleTabChange} />;
     if (activeTab === 'assessment') return <CompetencyAssessment onNavigate={handleTabChange} />;
     if (activeTab === 'skill-gaps') return <SkillGapAnalysis onNavigate={handleTabChange} />;
     if (activeTab === 'learning-path') return <LearningPath onNavigate={handleTabChange} />;
@@ -107,11 +115,11 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
-      <Header activeTab={activeTab} setActiveTab={handleTabChange} toggleMobileMenu={() => {}} />
+      <Header activeTab={activeTab} setActiveTab={handleTabChange} toggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
-      <div className="flex-1 max-w-7xl w-full mx-auto flex">
-        <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
-        <main className="flex-1 p-6 overflow-x-hidden">
+      <div className="flex-1 max-w-7xl w-full mx-auto flex relative">
+        <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} isMobileOpen={mobileMenuOpen} onCloseMobile={() => setMobileMenuOpen(false)} />
+        <main className="flex-1 p-4 sm:p-6 overflow-x-hidden w-full">
           {renderContent()}
         </main>
       </div>

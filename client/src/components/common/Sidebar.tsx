@@ -9,9 +9,16 @@ import {
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeTab,
+  setActiveTab,
+  isMobileOpen = false,
+  onCloseMobile = () => {}
+}) => {
   const { role } = useAuth();
 
   const officialMenuItems = [
@@ -38,12 +45,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'admin-framework', label: 'Competency Framework', icon: Settings },
     { id: 'courses', label: 'iGOT Course Matrix', icon: BookOpen },
     { id: 'nssta', label: 'NSSTA TPAC Programmes', icon: GraduationCap },
+    { id: 'statbot', label: 'StatBot AI Assistant', icon: Bot },
   ];
 
   const items = role === 'admin' ? adminMenuItems : officialMenuItems;
 
-  return (
-    <aside className="w-64 bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between shrink-0">
+  const handleItemClick = (id: string) => {
+    setActiveTab(id);
+    onCloseMobile();
+  };
+
+  const navContent = (
+    <div className="flex flex-col justify-between h-full">
       <div>
         <div className="px-3 py-2 mb-2">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -58,8 +71,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
+                onClick={() => handleItemClick(item.id)}
+                className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                   isActive
                     ? 'bg-gov-navy text-white shadow-sm'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -83,6 +96,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
           "Don't search for what to learn. Let AI identify what you need to learn next."
         </p>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 min-h-[calc(100vh-4rem)] p-4 flex-col justify-between shrink-0">
+        {navContent}
+      </aside>
+
+      {/* Mobile Drawer Overlay */}
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs" onClick={onCloseMobile} />
+          <div className="relative w-64 max-w-[80vw] bg-white h-full p-4 shadow-2xl z-10 flex flex-col justify-between animate-in slide-in-from-left">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+              <span className="text-xs font-black text-gov-navy">StatSkill Navigation</span>
+              <button onClick={onCloseMobile} className="p-1 rounded-lg text-slate-400 hover:text-slate-700">✕</button>
+            </div>
+            {navContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

@@ -19,6 +19,13 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: 4173,
-    allowedHosts: ['statskill-ai.onrender.com', '.onrender.com', 'localhost', '127.0.0.1']
+    allowedHosts: ['statskill-ai.onrender.com', '.onrender.com', 'localhost', '127.0.0.1'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   }
 })

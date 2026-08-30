@@ -14,19 +14,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+import { DEFAULT_OFFICIAL_USER, DEFAULT_ADMIN_USER } from '../services/api';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const initUser = async () => {
     try {
-      const savedUserId = localStorage.getItem('statskill_user_id') || 'u-1';
-      const res = await api.getMe(savedUserId);
-      if (res.user) {
-        setUser(res.user);
+      const savedUserId = localStorage.getItem('statskill_user_id');
+      if (savedUserId) {
+        const res = await api.getMe(savedUserId);
+        if (res?.user) {
+          setUser(res.user);
+        } else {
+          setUser(savedUserId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER);
+        }
       }
     } catch (e) {
-      console.error('Failed to init user', e);
+      console.warn('Init user fallback', e);
+      const savedUserId = localStorage.getItem('statskill_user_id');
+      if (savedUserId) {
+        setUser(savedUserId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -40,12 +50,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const res = await api.login(undefined, role);
-      if (res.user) {
-        setUser(res.user);
-        localStorage.setItem('statskill_user_id', res.user.id);
-      }
+      const targetUser = res?.user || (role === 'admin' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER);
+      setUser(targetUser);
+      localStorage.setItem('statskill_user_id', targetUser.id);
     } catch (e) {
-      console.error('Login error', e);
+      console.warn('Login fallback', e);
+      const targetUser = role === 'admin' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER;
+      setUser(targetUser);
+      localStorage.setItem('statskill_user_id', targetUser.id);
     } finally {
       setIsLoading(false);
     }
@@ -55,12 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const res = await api.switchUser(userId);
-      if (res.user) {
-        setUser(res.user);
-        localStorage.setItem('statskill_user_id', res.user.id);
-      }
+      const targetUser = res?.user || (userId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER);
+      setUser(targetUser);
+      localStorage.setItem('statskill_user_id', targetUser.id);
     } catch (e) {
-      console.error('Switch user error', e);
+      console.warn('Switch user fallback', e);
+      const targetUser = userId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER;
+      setUser(targetUser);
+      localStorage.setItem('statskill_user_id', targetUser.id);
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     try {
       const res = await api.getMe(user.id);
-      if (res.user) setUser(res.user);
+      if (res?.user) setUser(res.user);
     } catch (e) {
       console.error('Refresh user error', e);
     }

@@ -35,24 +35,46 @@ export const AppContent: React.FC = () => {
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Immediate Reactive Portal & Route Synchronization upon Role Change
+  // Immediate Reactive Portal & Route Synchronization upon Role or User Change
   useEffect(() => {
-    if (role === 'admin') {
-      if (!activeTab.startsWith('admin-') && activeTab !== 'courses' && activeTab !== 'nssta' && activeTab !== 'profile' && activeTab !== 'notifications' && activeTab !== 'statbot') {
-        setActiveTab('admin-dashboard');
-      }
-    } else {
-      if (activeTab.startsWith('admin-')) {
-        setActiveTab('dashboard');
+    if (user) {
+      if (role === 'admin') {
+        if (!activeTab.startsWith('admin-') && activeTab !== 'courses' && activeTab !== 'nssta' && activeTab !== 'profile' && activeTab !== 'notifications' && activeTab !== 'statbot') {
+          setActiveTab('admin-dashboard');
+        }
+      } else {
+        if (activeTab.startsWith('admin-') || activeTab === 'landing' || activeTab === 'login') {
+          setActiveTab('dashboard');
+        }
       }
     }
     setSelectedQuizId(null);
-  }, [role]);
+  }, [role, user?.id]);
 
-  // If not logged in, show Landing Page by default
-  if (!user && !isLoading) {
+  // Loading Screen while authenticating
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-gov-navy flex items-center justify-center text-white shadow-xl mb-4 animate-bounce">
+          <svg className="w-7 h-7 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.8L4.2 7 12 3.1 19.8 7 12 11.8zM2 17l10 5 10-5v-2l-10 5-10-5v2z"/>
+          </svg>
+        </div>
+        <p className="text-xs font-bold text-gov-navy tracking-tight">StatSkill AI • Official Statistical Intelligence</p>
+        <p className="text-[11px] text-slate-500 mt-1">Connecting to Government Statistical Cadre Session...</p>
+      </div>
+    );
+  }
+
+  // If not logged in, show Landing Page or Login Page
+  if (!user) {
     if (activeTab === 'login') {
-      return <LoginPage onLoginSuccess={() => setActiveTab(role === 'admin' ? 'admin-dashboard' : 'dashboard')} />;
+      return (
+        <LoginPage
+          onLoginSuccess={() => setActiveTab(role === 'admin' ? 'admin-dashboard' : 'dashboard')}
+          onBackToHome={() => setActiveTab('landing')}
+        />
+      );
     }
     return <LandingPage onGetStarted={() => setActiveTab('login')} />;
   }

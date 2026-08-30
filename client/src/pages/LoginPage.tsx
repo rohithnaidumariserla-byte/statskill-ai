@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Shield, User, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { Shield, User, Lock, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 
-export const LoginPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSuccess }) => {
+export const LoginPage: React.FC<{
+  onLoginSuccess?: () => void;
+  onBackToHome?: () => void;
+  initialRole?: 'official' | 'admin';
+}> = ({
+  onLoginSuccess,
+  onBackToHome,
+  initialRole = 'official'
+}) => {
   const { loginAs } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<'official' | 'admin'>('official');
+  const [selectedRole, setSelectedRole] = useState<'official' | 'admin'>(initialRole);
 
   const handleLogin = async (role: 'official' | 'admin') => {
     await loginAs(role);
@@ -12,7 +20,18 @@ export const LoginPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSu
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans relative">
+      {onBackToHome && (
+        <button
+          type="button"
+          onClick={onBackToHome}
+          className="absolute top-6 left-6 inline-flex items-center space-x-2 text-xs font-bold text-slate-600 hover:text-gov-navy bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-xs transition cursor-pointer"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Return to Landing Page</span>
+        </button>
+      )}
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         {/* Emblem */}
         <div className="w-14 h-14 rounded-2xl bg-gov-navy mx-auto flex items-center justify-center text-white shadow-lg mb-4">
@@ -28,8 +47,9 @@ export const LoginPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSu
         <div className="bg-white py-8 px-6 shadow-xl border border-slate-200 rounded-2xl sm:px-10">
           <div className="mb-6 flex border-b border-slate-200">
             <button
+              type="button"
               onClick={() => setSelectedRole('official')}
-              className={`flex-1 pb-3 text-xs font-bold transition border-b-2 ${
+              className={`flex-1 pb-3 text-xs font-bold transition border-b-2 cursor-pointer ${
                 selectedRole === 'official'
                   ? 'border-blue-600 text-blue-700'
                   : 'border-transparent text-slate-400 hover:text-slate-700'
@@ -38,8 +58,9 @@ export const LoginPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSu
               Official Login
             </button>
             <button
+              type="button"
               onClick={() => setSelectedRole('admin')}
-              className={`flex-1 pb-3 text-xs font-bold transition border-b-2 ${
+              className={`flex-1 pb-3 text-xs font-bold transition border-b-2 cursor-pointer ${
                 selectedRole === 'admin'
                   ? 'border-orange-600 text-orange-700'
                   : 'border-transparent text-slate-400 hover:text-slate-700'
@@ -63,8 +84,9 @@ export const LoginPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSu
               </div>
 
               <button
+                type="button"
                 onClick={() => handleLogin('official')}
-                className="w-full py-3 bg-gov-navy text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-900 transition flex items-center justify-center space-x-2"
+                className="w-full py-3 bg-gov-navy text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-900 transition flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <span>Login as Official (Rajesh Sharma)</span>
                 <ArrowRight className="w-4 h-4 text-amber-400" />
@@ -84,8 +106,9 @@ export const LoginPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSu
               </div>
 
               <button
+                type="button"
                 onClick={() => handleLogin('admin')}
-                className="w-full py-3 bg-gov-blue text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-800 transition flex items-center justify-center space-x-2"
+                className="w-full py-3 bg-gov-blue text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-800 transition flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <span>Login as Administrator (Dr. Sunita Rao)</span>
                 <ArrowRight className="w-4 h-4 text-amber-400" />

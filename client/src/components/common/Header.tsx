@@ -239,6 +239,16 @@ export const Header: React.FC<{ activeTab: string; setActiveTab: (tab: string) =
                 <p className="text-[10px] text-slate-500">{user?.employeeId || 'MOSPI-SSO'}</p>
               </div>
             </div>
+
+            {/* Logout Button */}
+            <button
+              type="button"
+              onClick={() => logout()}
+              title="Log Out to Landing Page"
+              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>

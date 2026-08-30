@@ -43,20 +43,23 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStart
 
           <div className="flex items-center space-x-3">
             <button
+              type="button"
               onClick={() => loginAs('official')}
-              className="text-xs font-bold text-slate-700 px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition"
+              className="text-xs font-bold text-slate-700 px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition cursor-pointer"
             >
               Official Login
             </button>
             <button
+              type="button"
               onClick={() => loginAs('admin')}
-              className="text-xs font-bold text-slate-700 px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition"
+              className="text-xs font-bold text-slate-700 px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition cursor-pointer"
             >
               Administrator Login
             </button>
             <button
+              type="button"
               onClick={onGetStarted}
-              className="text-xs font-bold text-white bg-gov-blue hover:bg-blue-800 px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5"
+              className="text-xs font-bold text-white bg-gov-blue hover:bg-blue-800 px-4 py-2 rounded-lg shadow-sm transition flex items-center space-x-1.5 cursor-pointer"
             >
               <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -90,15 +93,17 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStart
 
               <div className="flex flex-wrap gap-4 pt-2">
                 <button
+                  type="button"
                   onClick={() => loginAs('official')}
-                  className="px-6 py-3.5 bg-gov-navy text-white text-sm font-bold rounded-xl shadow-lg hover:bg-blue-900 transition flex items-center space-x-2"
+                  className="px-6 py-3.5 bg-gov-navy text-white text-sm font-bold rounded-xl shadow-lg hover:bg-blue-900 transition flex items-center space-x-2 cursor-pointer"
                 >
                   <span>Get Started (Official Demo)</span>
                   <ArrowRight className="w-4 h-4 text-amber-400" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => loginAs('admin')}
-                  className="px-6 py-3.5 bg-white text-slate-800 border border-slate-300 text-sm font-bold rounded-xl shadow-sm hover:bg-slate-50 transition flex items-center space-x-2"
+                  className="px-6 py-3.5 bg-white text-slate-800 border border-slate-300 text-sm font-bold rounded-xl shadow-sm hover:bg-slate-50 transition flex items-center space-x-2 cursor-pointer"
                 >
                   <span>Explore Platform (Admin View)</span>
                 </button>

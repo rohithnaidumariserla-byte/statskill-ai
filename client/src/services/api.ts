@@ -492,7 +492,7 @@ export const ALL_OFFICIAL_COURSES: CourseRecommendation[] = [
 ];
 
 // ============================================================================
-// COMPREHENSIVE QUESTION BANK & SEED QUESTIONS (25+ Curated Official Questions)
+// COMPREHENSIVE QUESTION BANK & SEED QUESTIONS (20+ Curated Official Questions)
 // ============================================================================
 export const CURATED_ASSESSMENT_QUESTIONS: AssessmentQuestion[] = [
   {
@@ -1004,6 +1004,87 @@ export const INITIAL_SAMPLE_QUIZZES: Quiz[] = [
 ];
 
 // ============================================================================
+// ANSWER NORMALIZATION & DYNAMIC EVALUATION ENGINE
+// ============================================================================
+export function normalizeAnswer(ans: any): number | null {
+  if (ans === null || ans === undefined || ans === '') return null;
+  if (typeof ans === 'number' && !isNaN(ans)) return Math.floor(ans);
+  if (typeof ans === 'string') {
+    const trimmed = ans.trim();
+    if (/^[0-9]+$/.test(trimmed)) return parseInt(trimmed, 10);
+    const upper = trimmed.toUpperCase();
+    if (upper === 'A' || upper.startsWith('OPTION A')) return 0;
+    if (upper === 'B' || upper.startsWith('OPTION B')) return 1;
+    if (upper === 'C' || upper.startsWith('OPTION C')) return 2;
+    if (upper === 'D' || upper.startsWith('OPTION D')) return 3;
+  }
+  return null;
+}
+
+export function isAnswerEqual(selected: any, correct: any): boolean {
+  const normSel = normalizeAnswer(selected);
+  const normCorr = normalizeAnswer(correct);
+  if (normSel === null || normCorr === null) return false;
+  return normSel === normCorr;
+}
+
+export function evaluateAttempt(
+  questions: AssessmentQuestion[],
+  answers: Record<string, any>
+) {
+  const totalQuestions = questions.length;
+  let correctCount = 0;
+  let answeredCount = 0;
+  const skillPerformance: Record<string, { total: number; correct: number; skillName: string; category: string }> = {};
+
+  const questionResults = questions.map(q => {
+    const userRaw = answers[q.id];
+    const normalizedUser = normalizeAnswer(userRaw);
+    const normalizedCorrect = normalizeAnswer(q.correctAnswer) ?? 0;
+    const isAnswered = normalizedUser !== null;
+    if (isAnswered) answeredCount++;
+    const isCorrect = isAnswered && normalizedUser === normalizedCorrect;
+    if (isCorrect) correctCount++;
+
+    if (!skillPerformance[q.skill]) {
+      skillPerformance[q.skill] = { total: 0, correct: 0, skillName: q.skill, category: q.category };
+    }
+    skillPerformance[q.skill].total += 1;
+    if (isCorrect) skillPerformance[q.skill].correct += 1;
+
+    return {
+      questionId: q.id,
+      question: q.question,
+      options: q.options,
+      userAnswer: normalizedUser,
+      correctAnswer: normalizedCorrect,
+      isCorrect,
+      isAnswered,
+      explanation: q.explanation || 'Official MoSPI standard rule.',
+      sourceRef: q.sourceRef || 'MoSPI Guidelines',
+      source: (q as any).source || 'NSSTA Academy',
+      sourceUrl: (q as any).sourceUrl || 'https://mospi.gov.in',
+      skill: q.skill
+    };
+  });
+
+  const unansweredCount = Math.max(0, totalQuestions - answeredCount);
+  const incorrectCount = Math.max(0, answeredCount - correctCount);
+  const scorePercentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+  return {
+    totalQuestions,
+    answeredCount,
+    correctCount,
+    incorrectCount,
+    unansweredCount,
+    scorePercentage,
+    questionResults,
+    skillPerformance
+  };
+}
+
+// ============================================================================
 // DYNAMIC STORAGE HELPERS (Local persistence synchronizing Admin & Official)
 // ============================================================================
 function computeDynamicQuizStatus(quiz: Quiz, now: Date = new Date()): QuizDynamicStatus {
@@ -1032,7 +1113,6 @@ function getStoredQuizzes(): Quiz[] {
     }
   } catch (e) {}
 
-  // Initialize with complete INITIAL_SAMPLE_QUIZZES
   const initial = INITIAL_SAMPLE_QUIZZES.map(q => ({
     ...q,
     computedStatus: computeDynamicQuizStatus(q)
@@ -1064,6 +1144,65 @@ function saveStoredAttempts(attempts: QuizAttempt[]): void {
   try {
     localStorage.setItem('statskill_attempts_store', JSON.stringify(attempts));
   } catch (e) {}
+}
+
+const DEFAULT_USER_SKILLS: UserSkill[] = [
+  { userId: 'u-1', skillId: 'sk-1', skillName: 'Sampling', category: 'Statistical', competencyScore: 81, competencyLevel: 'Advanced', lastAssessed: '2026-08-15' },
+  { userId: 'u-1', skillId: 'sk-2', skillName: 'Python', category: 'Technical', competencyScore: 42, competencyLevel: 'Intermediate', lastAssessed: '2026-08-20' },
+  { userId: 'u-1', skillId: 'sk-3', skillName: 'Cloud Computing', category: 'Technical', competencyScore: 25, competencyLevel: 'Beginner', lastAssessed: '2026-08-10' },
+  { userId: 'u-1', skillId: 'sk-4', skillName: 'AI/ML', category: 'Technical', competencyScore: 35, competencyLevel: 'Beginner', lastAssessed: '2026-08-12' },
+  { userId: 'u-1', skillId: 'sk-5', skillName: 'Survey Methodology & CAPI', category: 'Statistical', competencyScore: 48, competencyLevel: 'Intermediate', lastAssessed: '2026-08-01' },
+  { userId: 'u-1', skillId: 'sk-6', skillName: 'Data Visualization', category: 'Technical', competencyScore: 55, competencyLevel: 'Intermediate', lastAssessed: '2026-08-05' },
+  { userId: 'u-1', skillId: 'sk-7', skillName: 'National Accounts', category: 'Statistical', competencyScore: 82, competencyLevel: 'Advanced', lastAssessed: '2026-07-28' },
+  { userId: 'u-1', skillId: 'sk-8', skillName: 'Data Privacy', category: 'Digital Governance', competencyScore: 73, competencyLevel: 'Advanced', lastAssessed: '2026-08-18' }
+];
+
+export function getStoredUserSkills(userId: string): UserSkill[] {
+  try {
+    const raw = localStorage.getItem(`statskill_user_skills_${userId}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {}
+  return [...DEFAULT_USER_SKILLS];
+}
+
+export function saveStoredUserSkills(userId: string, skills: UserSkill[]): void {
+  try {
+    localStorage.setItem(`statskill_user_skills_${userId}`, JSON.stringify(skills));
+  } catch (e) {}
+}
+
+export function updateSkillScoreInStore(userId: string, skillName: string, assessmentScore: number, category?: string): UserSkill[] {
+  const skills = getStoredUserSkills(userId);
+  const match = skills.find(s =>
+    s.skillName.toLowerCase() === skillName.toLowerCase() ||
+    skillName.toLowerCase().includes(s.skillName.toLowerCase()) ||
+    s.skillName.toLowerCase().includes(skillName.toLowerCase())
+  );
+
+  let newScore = assessmentScore;
+  if (match) {
+    // Weighted update: 70% new assessment + 30% previous competency
+    newScore = Math.round(0.7 * assessmentScore + 0.3 * match.competencyScore);
+    match.competencyScore = newScore;
+    match.competencyLevel = newScore >= 80 ? 'Advanced' : newScore >= 60 ? 'Intermediate' : 'Beginner';
+    match.lastAssessed = new Date().toISOString().split('T')[0];
+  } else {
+    skills.push({
+      userId,
+      skillId: `sk-dyn-${Date.now()}`,
+      skillName,
+      category: category || 'Technical',
+      competencyScore: newScore,
+      competencyLevel: newScore >= 80 ? 'Advanced' : newScore >= 60 ? 'Intermediate' : 'Beginner',
+      lastAssessed: new Date().toISOString().split('T')[0]
+    });
+  }
+
+  saveStoredUserSkills(userId, skills);
+  return skills;
 }
 
 // Safe request wrapper that falls back to high-fidelity mock data if backend API is unreachable or returns non-JSON
@@ -1132,21 +1271,13 @@ export const api = {
   // Profile & Skills
   async getProfile(userId: string): Promise<{ user: User; skills: UserSkill[]; enrollments: any[] }> {
     const user = userId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER;
+    const currentSkills = getStoredUserSkills(userId);
     return safeFetch(
       `${API_BASE}/users/profile?userId=${userId}`,
       undefined,
       () => ({
         user,
-        skills: [
-          { userId: user.id, skillId: 'sk-1', skillName: 'Sampling & Survey Design', category: 'Statistical', competencyScore: 81, competencyLevel: 'Advanced', lastAssessed: '2026-08-15' },
-          { userId: user.id, skillId: 'sk-2', skillName: 'Python for Statistical Data Analysis', category: 'Technical', competencyScore: 42, competencyLevel: 'Intermediate', lastAssessed: '2026-08-20' },
-          { userId: user.id, skillId: 'sk-3', skillName: 'Cloud Computing (MeghRaj)', category: 'Technical', competencyScore: 25, competencyLevel: 'Beginner', lastAssessed: '2026-08-10' },
-          { userId: user.id, skillId: 'sk-4', skillName: 'AI & Machine Learning', category: 'Technical', competencyScore: 35, competencyLevel: 'Beginner', lastAssessed: '2026-08-12' },
-          { userId: user.id, skillId: 'sk-5', skillName: 'Survey Methodology & CAPI', category: 'Statistical', competencyScore: 48, competencyLevel: 'Intermediate', lastAssessed: '2026-08-01' },
-          { userId: user.id, skillId: 'sk-6', skillName: 'Data Visualization & PowerBI', category: 'Technical', competencyScore: 55, competencyLevel: 'Intermediate', lastAssessed: '2026-08-05' },
-          { userId: user.id, skillId: 'sk-7', skillName: 'National Accounts & SNA 2008', category: 'Statistical', competencyScore: 82, competencyLevel: 'Advanced', lastAssessed: '2026-07-28' },
-          { userId: user.id, skillId: 'sk-8', skillName: 'Cybersecurity & DPDP Governance', category: 'Digital Governance', competencyScore: 73, competencyLevel: 'Advanced', lastAssessed: '2026-08-18' }
-        ],
+        skills: currentSkills,
         enrollments: []
       })
     );
@@ -1160,11 +1291,16 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, ...data })
       },
-      () => ({
-        success: true,
-        user: { ...(userId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER), ...data },
-        skills: data.skills || []
-      })
+      () => {
+        if (data.skills) {
+          saveStoredUserSkills(userId, data.skills);
+        }
+        return {
+          success: true,
+          user: { ...(userId === 'u-2' ? DEFAULT_ADMIN_USER : DEFAULT_OFFICIAL_USER), ...data },
+          skills: data.skills || getStoredUserSkills(userId)
+        };
+      }
     );
   },
 
@@ -1187,31 +1323,85 @@ export const api = {
     );
   },
 
-  // Gap Analysis & Recommendations
+  // Dynamic Gap Analysis & Recommendations
   async getSkillGaps(userId: string): Promise<GapAnalysisReport> {
     return safeFetch(
       `${API_BASE}/skill-gaps?userId=${userId}`,
       undefined,
-      () => ({
-        overallCompetency: 72,
-        roleTitle: 'Statistical Officer',
-        cadre: 'Subordinate Statistical Service (SSS)',
-        gaps: [
-          { skillId: 'sk-2', skillName: 'Python for Statistical Data Analysis', category: 'Technical', currentScore: 42, requiredScore: 75, gap: 33, severity: 'High', currentLevel: 'Intermediate', requiredLevel: 'Advanced' },
-          { skillId: 'sk-3', skillName: 'Cloud Computing (MeghRaj)', category: 'Technical', currentScore: 25, requiredScore: 55, gap: 30, severity: 'High', currentLevel: 'Beginner', requiredLevel: 'Intermediate' },
-          { skillId: 'sk-4', skillName: 'AI & Machine Learning', category: 'Technical', currentScore: 35, requiredScore: 65, gap: 30, severity: 'High', currentLevel: 'Beginner', requiredLevel: 'Intermediate' },
-          { skillId: 'sk-5', skillName: 'Survey Methodology & CAPI', category: 'Statistical', currentScore: 48, requiredScore: 75, gap: 27, severity: 'High', currentLevel: 'Intermediate', requiredLevel: 'Advanced' },
-          { skillId: 'sk-6', skillName: 'Data Visualization & PowerBI', category: 'Technical', currentScore: 55, requiredScore: 70, gap: 15, severity: 'Medium', currentLevel: 'Intermediate', requiredLevel: 'Advanced' },
-          { skillId: 'sk-8', skillName: 'Cybersecurity & DPDP Governance', category: 'Digital Governance', currentScore: 73, requiredScore: 75, gap: 2, severity: 'Low', currentLevel: 'Advanced', requiredLevel: 'Advanced' },
-          { skillId: 'sk-1', skillName: 'Sampling & Survey Design', category: 'Statistical', currentScore: 81, requiredScore: 80, gap: 0, severity: 'Mastered', currentLevel: 'Advanced', requiredLevel: 'Advanced' },
-          { skillId: 'sk-7', skillName: 'National Accounts & SNA 2008', category: 'Statistical', currentScore: 82, requiredScore: 80, gap: 0, severity: 'Mastered', currentLevel: 'Advanced', requiredLevel: 'Advanced' }
-        ],
-        highGapCount: 4,
-        mediumGapCount: 1,
-        lowGapCount: 1,
-        masteredCount: 2,
-        aiExplanation: 'Your primary cadre competency deficit is Python for Statistical Data Analysis (-33% gap) and Cloud Computing (-30% gap). Addressing these through targeted iGOT courses will boost your readiness to 88%.'
-      })
+      () => {
+        const userSkills = getStoredUserSkills(userId);
+        const benchmarks: Record<string, number> = {
+          'python': 75,
+          'cloud computing': 55,
+          'ai/ml': 65,
+          'ai & machine learning': 65,
+          'survey methodology & capi': 75,
+          'data visualization': 70,
+          'data privacy': 75,
+          'cybersecurity': 75,
+          'sampling': 80,
+          'national accounts': 80
+        };
+
+        const gaps = userSkills.map(sk => {
+          const lower = sk.skillName.toLowerCase();
+          let req = 70;
+          for (const key of Object.keys(benchmarks)) {
+            if (lower.includes(key) || key.includes(lower)) {
+              req = benchmarks[key];
+              break;
+            }
+          }
+
+          const gap = Math.max(0, req - sk.competencyScore);
+          let severity: 'High' | 'Medium' | 'Low' | 'Mastered' = 'Mastered';
+          if (gap >= 20) severity = 'High';
+          else if (gap >= 10) severity = 'Medium';
+          else if (gap > 0) severity = 'Low';
+
+          const currentLevel: 'Beginner' | 'Intermediate' | 'Advanced' =
+            sk.competencyScore >= 80 ? 'Advanced' : sk.competencyScore >= 60 ? 'Intermediate' : 'Beginner';
+          const requiredLevel: 'Beginner' | 'Intermediate' | 'Advanced' =
+            req >= 80 ? 'Advanced' : req >= 60 ? 'Intermediate' : 'Beginner';
+
+          return {
+            skillId: sk.skillId,
+            skillName: sk.skillName,
+            category: sk.category,
+            currentScore: sk.competencyScore,
+            requiredScore: req,
+            gap,
+            severity,
+            currentLevel,
+            requiredLevel
+          };
+        });
+
+        gaps.sort((a, b) => b.gap - a.gap);
+
+        const highGapCount = gaps.filter(g => g.severity === 'High').length;
+        const mediumGapCount = gaps.filter(g => g.severity === 'Medium').length;
+        const lowGapCount = gaps.filter(g => g.severity === 'Low').length;
+        const masteredCount = gaps.filter(g => g.severity === 'Mastered').length;
+        const overallCompetency = gaps.length > 0 ? Math.round(gaps.reduce((acc, g) => acc + g.currentScore, 0) / gaps.length) : 70;
+
+        const topGap = gaps[0];
+        const aiExplanation = topGap && topGap.gap > 0
+          ? `Your primary cadre competency deficit is ${topGap.skillName} (-${topGap.gap}% gap). Completing targeted training modules will elevate your readiness to ${Math.min(95, overallCompetency + 15)}%.`
+          : `All core statistical competencies meet or exceed official cadre benchmarks. Continue participating in advanced masterclasses to maintain certification.`;
+
+        return {
+          overallCompetency,
+          roleTitle: 'Statistical Officer',
+          cadre: 'Subordinate Statistical Service (SSS)',
+          gaps,
+          highGapCount,
+          mediumGapCount,
+          lowGapCount,
+          masteredCount,
+          aiExplanation
+        };
+      }
     );
   },
 
@@ -1219,9 +1409,30 @@ export const api = {
     return safeFetch(
       `${API_BASE}/recommendations?userId=${userId}`,
       undefined,
-      () => ({
-        recommendations: ALL_OFFICIAL_COURSES.slice(0, 3)
-      })
+      () => {
+        const userSkills = getStoredUserSkills(userId);
+        const recs = ALL_OFFICIAL_COURSES.map(item => {
+          const matchingSkill = userSkills.find(s =>
+            s.skillName.toLowerCase().includes(item.course.skill.toLowerCase()) ||
+            item.course.skill.toLowerCase().includes(s.skillName.toLowerCase())
+          );
+          const currentScore = matchingSkill ? matchingSkill.competencyScore : (item.currentScore ?? 50);
+          const reqScore = item.requiredScore ?? 75;
+          const gap = Math.max(0, reqScore - currentScore);
+          const matchScore = Math.min(99, 60 + Math.round(gap * 1.1));
+
+          return {
+            ...item,
+            currentScore,
+            gap,
+            matchScore,
+            priorityLevel: gap >= 20 ? 'HIGH PRIORITY' : gap >= 10 ? 'MEDIUM PRIORITY' : 'LOW PRIORITY'
+          } as CourseRecommendation;
+        });
+
+        recs.sort((a, b) => (b.gap ?? 0) - (a.gap ?? 0));
+        return { recommendations: recs.slice(0, 3) };
+      }
     );
   },
 
@@ -1229,91 +1440,98 @@ export const api = {
     return safeFetch(
       `${API_BASE}/learning-path?userId=${userId}`,
       undefined,
-      () => ({
-        learningPath: {
-          cadreTitle: 'Statistical Officer (SSS)',
-          targetReadiness: '88%',
-          phases: [
-            {
-              phase: 1,
-              title: 'Phase 1: High Priority Deficit Remediation',
-              description: 'Directly address severe competency gaps in Python and Cloud Infrastructure.',
-              status: 'in-progress',
-              courses: [
-                {
-                  id: 'c-1',
-                  title: 'Python for Statistical Data Analysis',
-                  skill: 'Python',
-                  gap: 33,
-                  completed: false,
-                  submodules: ['1. Python Basics', '2. NumPy Arrays', '3. Pandas DataFrames', '4. Statistical Modeling', '5. Data Visualization', '6. Practice Assessment', '7. Reassessment'],
-                  externalUrl: 'https://www.kaggle.com/learn/python'
-                },
-                {
-                  id: 'c-4',
-                  title: 'Government Cloud Infrastructure for Statisticians',
-                  skill: 'Cloud Computing',
-                  gap: 30,
-                  completed: false,
-                  submodules: ['1. MeghRaj Architecture', '2. Microdata S3 Storage', '3. Zero-Trust Access', '4. Containerized APIs', '5. Disaster Recovery', '6. Practice Assessment'],
-                  externalUrl: 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/'
-                }
-              ]
-            },
-            {
-              phase: 2,
-              title: 'Phase 2: Applied Machine Learning & Imputation',
-              description: 'Master automated data imputation and microdata analysis algorithms.',
-              status: 'locked',
-              courses: [
-                {
-                  id: 'c-2',
-                  title: 'AI & Machine Learning for Official Statistics',
-                  skill: 'AI/ML',
-                  gap: 30,
-                  completed: false,
-                  submodules: ['1. ML Taxonomy in Stats', '2. Automated Classification (NLP)', '3. Anomaly Detection (ASI)', '4. Satellite Remote Sensing', '5. Ethical AI & Bias', '6. Practice Assessment'],
-                  externalUrl: 'https://developers.google.com/machine-learning/crash-course'
-                }
-              ]
-            },
-            {
-              phase: 3,
-              title: 'Phase 3: CAPI Digital Survey Optimization',
-              description: 'Modernize field data collection and real-time validation checks.',
-              status: 'locked',
-              courses: [
-                {
-                  id: 'c-9',
-                  title: 'Advanced Survey Sampling & Estimation Techniques',
-                  skill: 'Sampling',
-                  gap: 27,
-                  completed: false,
-                  submodules: ['1. Questionnaire Design', '2. Real-Time Logic Rules', '3. Paradata Diagnostics', '4. Field Quality Assurance'],
-                  externalUrl: 'https://unstats.un.org/unsd/methodology/surveys/'
-                }
-              ]
-            },
-            {
-              phase: 4,
-              title: 'Phase 4: Official Dissemination & Policy Dashboards',
-              description: 'Create interactive public policy dashboards with PowerBI and WebGL.',
-              status: 'locked',
-              courses: [
-                {
-                  id: 'c-6',
-                  title: 'Modern Data Visualization with PowerBI for Public Policy',
-                  skill: 'Data Visualization',
-                  gap: 15,
-                  completed: false,
-                  submodules: ['1. PowerBI Data Models', '2. DAX Measures', '3. Geo-Spatial Visuals', '4. Ministry Dashboards'],
-                  externalUrl: 'https://learn.microsoft.com/en-us/training/paths/create-use-analytics-reports-power-bi/'
-                }
-              ]
-            }
-          ]
-        }
-      })
+      () => {
+        const userSkills = getStoredUserSkills(userId);
+        const pythonSkill = userSkills.find(s => s.skillName.toLowerCase().includes('python'))?.competencyScore || 42;
+        const cloudSkill = userSkills.find(s => s.skillName.toLowerCase().includes('cloud'))?.competencyScore || 25;
+        const aiSkill = userSkills.find(s => s.skillName.toLowerCase().includes('ai'))?.competencyScore || 35;
+
+        return {
+          learningPath: {
+            cadreTitle: 'Statistical Officer (SSS)',
+            targetReadiness: '88%',
+            phases: [
+              {
+                phase: 1,
+                title: 'Phase 1: High Priority Deficit Remediation',
+                description: 'Directly address severe competency gaps in Python and Cloud Infrastructure.',
+                status: 'in-progress',
+                courses: [
+                  {
+                    id: 'c-1',
+                    title: 'Python for Statistical Data Analysis',
+                    skill: 'Python',
+                    gap: Math.max(0, 75 - pythonSkill),
+                    completed: false,
+                    submodules: ['1. Python Basics', '2. NumPy Arrays', '3. Pandas DataFrames', '4. Statistical Modeling', '5. Data Visualization', '6. Practice Assessment', '7. Reassessment'],
+                    externalUrl: 'https://www.kaggle.com/learn/python'
+                  },
+                  {
+                    id: 'c-4',
+                    title: 'Government Cloud Infrastructure for Statisticians',
+                    skill: 'Cloud Computing',
+                    gap: Math.max(0, 55 - cloudSkill),
+                    completed: false,
+                    submodules: ['1. MeghRaj Architecture', '2. Microdata S3 Storage', '3. Zero-Trust Access', '4. Containerized APIs', '5. Disaster Recovery', '6. Practice Assessment'],
+                    externalUrl: 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/'
+                  }
+                ]
+              },
+              {
+                phase: 2,
+                title: 'Phase 2: Applied Machine Learning & Imputation',
+                description: 'Master automated data imputation and microdata analysis algorithms.',
+                status: 'locked',
+                courses: [
+                  {
+                    id: 'c-2',
+                    title: 'AI & Machine Learning for Official Statistics',
+                    skill: 'AI/ML',
+                    gap: Math.max(0, 65 - aiSkill),
+                    completed: false,
+                    submodules: ['1. ML Taxonomy in Stats', '2. Automated Classification (NLP)', '3. Anomaly Detection (ASI)', '4. Satellite Remote Sensing', '5. Ethical AI & Bias', '6. Practice Assessment'],
+                    externalUrl: 'https://developers.google.com/machine-learning/crash-course'
+                  }
+                ]
+              },
+              {
+                phase: 3,
+                title: 'Phase 3: CAPI Digital Survey Optimization',
+                description: 'Modernize field data collection and real-time validation checks.',
+                status: 'locked',
+                courses: [
+                  {
+                    id: 'c-9',
+                    title: 'Advanced Survey Sampling & Estimation Techniques',
+                    skill: 'Sampling',
+                    gap: 0,
+                    completed: false,
+                    submodules: ['1. Questionnaire Design', '2. Real-Time Logic Rules', '3. Paradata Diagnostics', '4. Field Quality Assurance'],
+                    externalUrl: 'https://unstats.un.org/unsd/methodology/surveys/'
+                  }
+                ]
+              },
+              {
+                phase: 4,
+                title: 'Phase 4: Official Dissemination & Policy Dashboards',
+                description: 'Create interactive public policy dashboards with PowerBI and WebGL.',
+                status: 'locked',
+                courses: [
+                  {
+                    id: 'c-6',
+                    title: 'Modern Data Visualization with PowerBI for Public Policy',
+                    skill: 'Data Visualization',
+                    gap: 15,
+                    completed: false,
+                    submodules: ['1. PowerBI Data Models', '2. DAX Measures', '3. Geo-Spatial Visuals', '4. Ministry Dashboards'],
+                    externalUrl: 'https://learn.microsoft.com/en-us/training/paths/create-use-analytics-reports-power-bi/'
+                  }
+                ]
+              }
+            ]
+          }
+        };
+      }
     );
   },
 
@@ -1426,22 +1644,41 @@ export const api = {
     );
   },
 
-  // Assessment & Adaptive Engine
-  async startAssessment(userId: string): Promise<any> {
+  // ==========================================================================
+  // DYNAMIC SKILL ASSESSMENT ENGINE (Authoritative scoring, NO fake values)
+  // ==========================================================================
+  async startAssessment(userId: string, skill?: string, count: number = 5): Promise<any> {
     return safeFetch(
       `${API_BASE}/assessment/start`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId, skill, count })
       },
-      () => ({
-        questions: CURATED_ASSESSMENT_QUESTIONS.slice(0, 5)
-      })
+      () => {
+        let pool = [...CURATED_ASSESSMENT_QUESTIONS];
+        if (skill && skill !== 'all') {
+          const matching = pool.filter(q => q.skill.toLowerCase().includes(skill.toLowerCase()));
+          if (matching.length > 0) pool = matching;
+        }
+        const selected = pool.slice(0, Math.min(count, pool.length));
+        const assessmentId = `asmt-${Date.now()}`;
+
+        // Cache active assessment questions for evaluation
+        try {
+          localStorage.setItem(`statskill_active_asmt_${userId}`, JSON.stringify({ assessmentId, questions: selected }));
+        } catch (e) {}
+
+        return {
+          assessmentId,
+          totalQuestions: selected.length,
+          questions: selected
+        };
+      }
     );
   },
 
-  async evaluateQuestion(questionId: string, selectedAnswer: number): Promise<any> {
+  async evaluateQuestion(questionId: string, selectedAnswer: any): Promise<any> {
     return safeFetch(
       `${API_BASE}/assessment/evaluate-question`,
       {
@@ -1449,14 +1686,27 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questionId, selectedAnswer })
       },
-      () => ({
-        isCorrect: selectedAnswer === 0,
-        explanation: 'Correct! The official statistical standard rule fulfills the cadre benchmark requirement.'
-      })
+      () => {
+        const q = CURATED_ASSESSMENT_QUESTIONS.find(item => item.id === questionId);
+        if (!q) {
+          return {
+            isCorrect: false,
+            correctAnswer: 0,
+            explanation: 'Official standard question not found.'
+          };
+        }
+
+        const isCorrect = isAnswerEqual(selectedAnswer, q.correctAnswer);
+        return {
+          isCorrect,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation
+        };
+      }
     );
   },
 
-  async submitAssessment(userId: string, answers: Record<string, number>): Promise<any> {
+  async submitAssessment(userId: string, answers: Record<string, any>, customQuestions?: AssessmentQuestion[]): Promise<any> {
     return safeFetch(
       `${API_BASE}/assessment/submit`,
       {
@@ -1464,16 +1714,63 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, answers })
       },
-      () => ({
-        score: 85,
-        correctCount: 3,
-        totalQuestions: 3,
-        aiFeedback: 'Excellent performance in Sampling Design and Vectorized Python. Focus on Cloud Architecture to reach Advanced level.',
-        updatedSkills: [
-          { skillName: 'Sampling & Survey Design', category: 'Statistical', competencyScore: 88, competencyLevel: 'Advanced' },
-          { skillName: 'Python for Statistical Data Analysis', category: 'Technical', competencyScore: 65, competencyLevel: 'Intermediate' }
-        ]
-      })
+      () => {
+        let questions = customQuestions;
+        if (!questions || questions.length === 0) {
+          try {
+            const cached = localStorage.getItem(`statskill_active_asmt_${userId}`);
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (parsed?.questions && Array.isArray(parsed.questions)) {
+                questions = parsed.questions;
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (!questions || questions.length === 0) {
+          questions = CURATED_ASSESSMENT_QUESTIONS.slice(0, 5);
+        }
+
+        const evaluated = evaluateAttempt(questions, answers);
+
+        // Dynamically update user skills
+        const updatedSkills: UserSkill[] = [];
+        Object.keys(evaluated.skillPerformance).forEach(skillName => {
+          const perf = evaluated.skillPerformance[skillName];
+          const skillPct = perf.total > 0 ? Math.round((perf.correct / perf.total) * 100) : 0;
+          updateSkillScoreInStore(userId, skillName, skillPct, perf.category);
+        });
+
+        const latestSkills = getStoredUserSkills(userId);
+
+        const attemptId = `asmt-${Date.now()}`;
+        const aiFeedback = evaluated.scorePercentage >= 70
+          ? `High performance demonstrated! You scored ${evaluated.scorePercentage}% (${evaluated.correctCount}/${evaluated.totalQuestions} correct) fulfilling official benchmark requirements.`
+          : `Identified competency deficits (${evaluated.scorePercentage}%: ${evaluated.correctCount}/${evaluated.totalQuestions} correct). Recommended next step: Complete targeted training modules.`;
+
+        const report = {
+          attemptId,
+          score: evaluated.scorePercentage,
+          scorePercentage: evaluated.scorePercentage,
+          correctCount: evaluated.correctCount,
+          incorrectCount: evaluated.incorrectCount,
+          answeredCount: evaluated.answeredCount,
+          unansweredCount: evaluated.unansweredCount,
+          totalQuestions: evaluated.totalQuestions,
+          questionResults: evaluated.questionResults,
+          updatedSkills: latestSkills,
+          aiFeedback,
+          submittedAt: new Date().toISOString()
+        };
+
+        // Persist completed assessment report
+        try {
+          localStorage.setItem(`statskill_last_assessment_report_${userId}`, JSON.stringify(report));
+        } catch (e) {}
+
+        return report;
+      }
     );
   },
 
@@ -1659,7 +1956,6 @@ export const api = {
           stored[idx].computedStatus = 'CLOSED';
           saveStoredQuizzes(stored);
 
-          // Finalize active attempts
           const attempts = getStoredAttempts();
           attempts.forEach(att => {
             if (att.quizId === id && att.status === 'IN_PROGRESS') {
@@ -1758,7 +2054,6 @@ export const api = {
         const quiz = quizzes.find(q => q.id === quizId) || quizzes[0];
         const attempts = getStoredAttempts();
 
-        // Check if there is already an active or completed attempt
         let existing = attempts.find(a => a.userId === userId && a.quizId === quizId);
         if (existing) {
           const totalSec = (quiz?.timeLimitMinutes || 15) * 60;
@@ -1791,7 +2086,7 @@ export const api = {
     );
   },
 
-  async recordQuizAnswer(attemptId: string, questionId: string, selectedAnswer: number | null): Promise<any> {
+  async recordQuizAnswer(attemptId: string, questionId: string, selectedAnswer: any): Promise<any> {
     return safeFetch(
       `${API_BASE}/quiz/attempt/${attemptId}/answer`,
       {
@@ -1804,7 +2099,7 @@ export const api = {
         const att = attempts.find(a => a.id === attemptId);
         if (att) {
           if (!att.answers) att.answers = {};
-          att.answers[questionId] = selectedAnswer;
+          att.answers[questionId] = normalizeAnswer(selectedAnswer);
           saveStoredAttempts(attempts);
         }
         return { success: true };
@@ -1815,7 +2110,7 @@ export const api = {
   async submitQuiz(
     quizId: string,
     userId: string,
-    answers: Record<string, number | null>,
+    answers: Record<string, any>,
     submissionType: 'Manual' | 'Auto-submitted',
     reason: QuizSubmissionReason,
     attemptId?: string,
@@ -1832,35 +2127,14 @@ export const api = {
         const quizzes = getStoredQuizzes();
         const quiz = quizzes.find(q => q.id === quizId) || quizzes[0];
         const questions = quiz ? quiz.questions : CURATED_ASSESSMENT_QUESTIONS.slice(0, 10);
-        const totalQuestions = questions.length || 1;
+        const evaluated = evaluateAttempt(questions, answers);
 
-        let correctCount = 0;
-        let answeredCount = 0;
-
-        const questionResults = questions.map((q) => {
-          const userAns = answers[q.id];
-          const isAnswered = userAns !== undefined && userAns !== null;
-          if (isAnswered) answeredCount++;
-          const isCorrect = isAnswered && Number(userAns) === q.correctAnswer;
-          if (isCorrect) correctCount++;
-
-          return {
-            questionId: q.id,
-            question: q.question,
-            options: q.options,
-            userAnswer: isAnswered ? Number(userAns) : null,
-            correctAnswer: q.correctAnswer,
-            isCorrect,
-            explanation: q.explanation || 'Official MoSPI standard rule.',
-            sourceRef: q.sourceRef || 'MoSPI Guidelines',
-            source: (q as any).source || 'NSSTA Academy',
-            sourceUrl: (q as any).sourceUrl || 'https://mospi.gov.in'
-          };
+        // Dynamically update skills
+        Object.keys(evaluated.skillPerformance).forEach(skillName => {
+          const perf = evaluated.skillPerformance[skillName];
+          const skillPct = perf.total > 0 ? Math.round((perf.correct / perf.total) * 100) : 0;
+          updateSkillScoreInStore(userId, skillName, skillPct, perf.category);
         });
-
-        const unansweredCount = Math.max(0, totalQuestions - answeredCount);
-        const incorrectCount = Math.max(0, answeredCount - correctCount);
-        const score = Math.round((correctCount / totalQuestions) * 100);
 
         const attempts = getStoredAttempts();
         let att = attemptId ? attempts.find(a => a.id === attemptId) : attempts.find(a => a.userId === userId && a.quizId === quizId);
@@ -1872,7 +2146,7 @@ export const api = {
             quizId,
             startedAt: new Date(Date.now() - (timeSpent || 120) * 1000).toISOString(),
             answers: {},
-            totalQuestions
+            totalQuestions: evaluated.totalQuestions
           } as QuizAttempt;
           attempts.unshift(att);
         }
@@ -1882,17 +2156,17 @@ export const api = {
         att.submissionType = submissionType;
         att.submissionReason = reason || 'MANUAL_SUBMISSION';
         att.submittedAt = new Date().toISOString();
-        att.score = score;
-        att.correctCount = correctCount;
-        att.incorrectCount = incorrectCount;
-        att.answeredCount = answeredCount;
-        att.unansweredCount = unansweredCount;
-        att.totalQuestions = totalQuestions;
+        att.score = evaluated.scorePercentage;
+        att.correctCount = evaluated.correctCount;
+        att.incorrectCount = evaluated.incorrectCount;
+        att.answeredCount = evaluated.answeredCount;
+        att.unansweredCount = evaluated.unansweredCount;
+        att.totalQuestions = evaluated.totalQuestions;
         att.timeSpentSeconds = timeSpent || 120;
-        att.questionResults = questionResults;
-        att.aiFeedback = score >= 70
-          ? `Outstanding performance in ${quiz.targetSkill}! You achieved ${score}% (${correctCount}/${totalQuestions} correct), demonstrating solid mastery of official standards.`
-          : `Identified actionable skill gaps in ${quiz.targetSkill} (${score}%: ${correctCount}/${totalQuestions} correct). Recommended next step: Complete targeted training modules to elevate your score to benchmark.`;
+        att.questionResults = evaluated.questionResults;
+        att.aiFeedback = evaluated.scorePercentage >= 70
+          ? `Outstanding performance in ${quiz.targetSkill}! You achieved ${evaluated.scorePercentage}% (${evaluated.correctCount}/${evaluated.totalQuestions} correct), demonstrating solid mastery of official standards.`
+          : `Identified actionable skill gaps in ${quiz.targetSkill} (${evaluated.scorePercentage}%: ${evaluated.correctCount}/${evaluated.totalQuestions} correct). Recommended next step: Complete targeted training modules to elevate your score to benchmark.`;
 
         saveStoredAttempts(attempts);
 
@@ -1900,9 +2174,9 @@ export const api = {
           success: true,
           attempt: att,
           ...att,
-          passed: score >= (quiz.passingScorePercentage || 60),
-          scorePercentage: score,
-          scoreBoost: Math.max(5, Math.round((score / 100) * 15))
+          passed: evaluated.scorePercentage >= (quiz.passingScorePercentage || 60),
+          scorePercentage: evaluated.scorePercentage,
+          scoreBoost: Math.max(5, Math.round((evaluated.scorePercentage / 100) * 15))
         };
       }
     );
@@ -1919,11 +2193,12 @@ export const api = {
       () => {
         const attempts = getStoredAttempts();
         const att = attempts.find(a => a.id === attemptId);
+        const score = att?.score ?? 0;
         return {
           success: true,
-          passed: true,
-          scorePercentage: att?.score || 85,
-          attempt: att || ({ id: attemptId, status: 'SUBMITTED', score: 85 } as QuizAttempt)
+          passed: score >= 60,
+          scorePercentage: score,
+          attempt: att || ({ id: attemptId, status: 'SUBMITTED', score } as QuizAttempt)
         };
       }
     );
@@ -1983,7 +2258,6 @@ export const api = {
         body: isFormData ? payload : JSON.stringify(payload)
       },
       () => {
-        // Filter or create count questions matching targetSkill
         let matching = CURATED_ASSESSMENT_QUESTIONS.filter(q =>
           q.skill.toLowerCase().includes(targetSkill.toLowerCase()) ||
           targetSkill.toLowerCase().includes(q.skill.toLowerCase())
@@ -2149,41 +2423,50 @@ export const api = {
     return safeFetch(
       `${API_BASE}/admin/analytics`,
       undefined,
-      () => ({
-        workforceOverview: {
-          totalOfficials: 12450,
-          officialsAssessed: 10820,
-          averageCompetency: 68,
-          officialsRequiringUpskilling: 3840,
-          criticalSkillGapsCount: 4,
-          activeAssessments: 3,
-          trainingCompletionRate: 78,
-          totalTrainingHours: '3.2M',
-          coursesCompleted: 78420
-        },
-        coreCompetencyGaps: [
-          { competency: 'Python & Statistical Computing', currentScore: 42, requiredScore: 75, gap: 33, proficiencyLevel: 'Developing', status: 'Needs Urgent Improvement', officialsAffected: 4850, severity: 'High' },
-          { competency: 'Cloud Computing (MeghRaj)', currentScore: 25, requiredScore: 55, gap: 30, proficiencyLevel: 'Beginner', status: 'Critical Attention', officialsAffected: 1248, severity: 'High' },
-          { competency: 'AI & Machine Learning', currentScore: 35, requiredScore: 65, gap: 30, proficiencyLevel: 'Developing', status: 'Needs Improvement', officialsAffected: 7720, severity: 'High' },
-          { competency: 'Survey Methodology & CAPI', currentScore: 48, requiredScore: 75, gap: 27, proficiencyLevel: 'Developing', status: 'Critical Attention', officialsAffected: 4320, severity: 'High' },
-          { competency: 'Data Visualization & PowerBI', currentScore: 55, requiredScore: 70, gap: 15, proficiencyLevel: 'Developing', status: 'Needs Improvement', officialsAffected: 3620, severity: 'Medium' },
-          { competency: 'Cybersecurity & Governance', currentScore: 73, requiredScore: 75, gap: 2, proficiencyLevel: 'Proficient', status: 'Good Progress', officialsAffected: 890, severity: 'Low' },
-          { competency: 'Statistics & Sampling Theory', currentScore: 81, requiredScore: 80, gap: 0, proficiencyLevel: 'Advanced', status: 'Well Aligned', officialsAffected: 450, severity: 'Mastered' },
-          { competency: 'National Accounts & SNA 2008', currentScore: 82, requiredScore: 80, gap: 0, proficiencyLevel: 'Advanced', status: 'Well Aligned', officialsAffected: 620, severity: 'Mastered' }
-        ],
-        futureSkills: [
-          { skill: 'AI-Assisted Statistical Analysis', expectedDemand: 'High', currentReadiness: 42, futureNeed: 80, predictedGap: 38 },
-          { skill: 'Advanced Data Visualization & Storytelling', expectedDemand: 'High', currentReadiness: 55, futureNeed: 75, predictedGap: 20 },
-          { skill: 'Machine Learning for Official Statistics', expectedDemand: 'High', currentReadiness: 34, futureNeed: 65, predictedGap: 31 },
-          { skill: 'Statistical Programming & Python Vectorization', expectedDemand: 'High', currentReadiness: 46, futureNeed: 78, predictedGap: 32 }
-        ],
-        trainingEffectiveness: [
-          { course: 'Python for Statistical Computing', preScore: 42, postScore: 75, uplift: 33 },
-          { course: 'Sampling & Survey Methodologies', preScore: 61, postScore: 89, uplift: 28 },
-          { course: 'Cloud Infrastructure for Statisticians', preScore: 25, postScore: 58, uplift: 33 },
-          { course: 'National Accounts & SNA 2008', preScore: 58, postScore: 84, uplift: 26 }
-        ]
-      })
+      () => {
+        const userSkills = getStoredUserSkills('u-1');
+        const avg = userSkills.length > 0 ? Math.round(userSkills.reduce((a, b) => a + b.competencyScore, 0) / userSkills.length) : 68;
+
+        return {
+          workforceOverview: {
+            totalOfficials: 12450,
+            officialsAssessed: 10820,
+            averageCompetency: avg,
+            officialsRequiringUpskilling: 3840,
+            criticalSkillGapsCount: 4,
+            activeAssessments: 3,
+            trainingCompletionRate: 78,
+            totalTrainingHours: '3.2M',
+            coursesCompleted: 78420
+          },
+          coreCompetencyGaps: userSkills.map(sk => {
+            const req = 75;
+            const gap = Math.max(0, req - sk.competencyScore);
+            return {
+              competency: sk.skillName,
+              currentScore: sk.competencyScore,
+              requiredScore: req,
+              gap,
+              proficiencyLevel: sk.competencyLevel,
+              status: gap >= 20 ? 'Needs Urgent Improvement' : gap >= 10 ? 'Needs Improvement' : 'Well Aligned',
+              officialsAffected: gap * 150,
+              severity: gap >= 20 ? 'High' : gap >= 10 ? 'Medium' : 'Mastered'
+            };
+          }),
+          futureSkills: [
+            { skill: 'AI-Assisted Statistical Analysis', expectedDemand: 'High', currentReadiness: 42, futureNeed: 80, predictedGap: 38 },
+            { skill: 'Advanced Data Visualization & Storytelling', expectedDemand: 'High', currentReadiness: 55, futureNeed: 75, predictedGap: 20 },
+            { skill: 'Machine Learning for Official Statistics', expectedDemand: 'High', currentReadiness: 34, futureNeed: 65, predictedGap: 31 },
+            { skill: 'Statistical Programming & Python Vectorization', expectedDemand: 'High', currentReadiness: 46, futureNeed: 78, predictedGap: 32 }
+          ],
+          trainingEffectiveness: [
+            { course: 'Python for Statistical Computing', preScore: 42, postScore: 75, uplift: 33 },
+            { course: 'Sampling & Survey Methodologies', preScore: 61, postScore: 89, uplift: 28 },
+            { course: 'Cloud Infrastructure for Statisticians', preScore: 25, postScore: 58, uplift: 33 },
+            { course: 'National Accounts & SNA 2008', preScore: 58, postScore: 84, uplift: 26 }
+          ]
+        };
+      }
     );
   },
 
@@ -2370,7 +2653,7 @@ export const api = {
     );
   },
 
-  async submitPracticeQuiz(userId: string, skillName: string, selectedAnswers: { [questionId: string]: number }): Promise<any> {
+  async submitPracticeQuiz(userId: string, skillName: string, selectedAnswers: { [questionId: string]: any }): Promise<any> {
     return safeFetch(
       `${API_BASE}/igot/practice/submit`,
       {
@@ -2378,13 +2661,29 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, skillName, selectedAnswers })
       },
-      () => ({
-        success: true,
-        score: 100,
-        passed: true,
-        scoreBoost: 12,
-        feedback: 'Outstanding mastery demonstrated! Competency level officially upgraded.'
-      })
+      () => {
+        const pool = CURATED_ASSESSMENT_QUESTIONS.filter(q =>
+          q.skill.toLowerCase().includes(skillName.toLowerCase()) ||
+          skillName.toLowerCase().includes(q.skill.toLowerCase())
+        );
+        const questions = pool.length > 0 ? pool.slice(0, 5) : CURATED_ASSESSMENT_QUESTIONS.slice(0, 5);
+        const evalRes = evaluateAttempt(questions, selectedAnswers);
+
+        // Update skill score
+        updateSkillScoreInStore(userId, skillName, evalRes.scorePercentage);
+
+        return {
+          success: true,
+          score: evalRes.scorePercentage,
+          correctCount: evalRes.correctCount,
+          totalQuestions: evalRes.totalQuestions,
+          passed: evalRes.scorePercentage >= 60,
+          scoreBoost: Math.max(5, Math.round((evalRes.scorePercentage / 100) * 15)),
+          feedback: evalRes.scorePercentage >= 60
+            ? 'Outstanding mastery demonstrated! Competency level officially upgraded.'
+            : 'Practice completed. Review the core rationale and retry when ready.'
+        };
+      }
     );
   },
 

@@ -64,6 +64,429 @@ export const DEFAULT_ADMIN_USER: User = {
   coursesInProgress: 3
 };
 
+export const ALL_OFFICIAL_COURSES: CourseRecommendation[] = [
+  {
+    course: {
+      id: 'c-1',
+      title: 'Python for Statistical Data Analysis',
+      provider: 'Kaggle Learn / iGOT',
+      skill: 'Python',
+      skillCategory: 'Technical',
+      difficulty: 'Intermediate',
+      duration: '8 hours',
+      durationHours: 8,
+      rating: 4.8,
+      enrolledCount: 1420,
+      source: 'iGOT',
+      description: 'Comprehensive Python for statistical officers covering data wrangling with Pandas, automated survey data ingestion, validation checks, and descriptive modeling.',
+      syllabus: [
+        'Pandas for Large-Scale Survey Microdata',
+        'Handling Missing Values and Imputation in Official Statistics',
+        'Automating National Account Indicators with NumPy and SciPy',
+        'Exporting Standardized MoSPI Statistical Tables'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://www.kaggle.com/learn/python',
+      status: 'active'
+    },
+    matchScore: 96,
+    priorityLevel: 'HIGH PRIORITY',
+    currentScore: 42,
+    requiredScore: 75,
+    gap: 33,
+    whyReason: 'Your Python competency is 33 percentage points below the 75% benchmark required for Statistical Officers. Completing this training directly addresses your highest career gap.',
+    reason: 'Critical cadre skill gap (-33%) in statistical data analysis scripting.',
+    isEnrolled: true,
+    progress: 40,
+    breakdown: { skillGapWeight: 35, roleRelevanceWeight: 25, previousLearningWeight: 15, careerRequirementWeight: 10, deptPriorityWeight: 8, emergingDemandWeight: 7 }
+  },
+  {
+    course: {
+      id: 'c-2',
+      title: 'AI & Machine Learning for Official Statistics',
+      provider: 'Google / Coursera / iGOT',
+      skill: 'AI/ML',
+      skillCategory: 'Technical',
+      difficulty: 'Intermediate',
+      duration: '12 hours',
+      durationHours: 12,
+      rating: 4.9,
+      enrolledCount: 980,
+      source: 'iGOT',
+      description: 'Practical application of machine learning in survey data imputation, outlier detection, automated text coding of economic classifications (NIC & NCO), and satellite data analysis.',
+      syllabus: [
+        'Machine Learning Taxonomy for National Statistical Offices',
+        'Automated Industry & Occupation Coding (NIC/NCO) via NLP',
+        'Anomaly and Fraud Detection in Industrial Surveys (ASI)',
+        'Satellite Imagery Estimation for Agricultural Yields'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://developers.google.com/machine-learning/crash-course',
+      status: 'active'
+    },
+    matchScore: 89,
+    priorityLevel: 'HIGH PRIORITY',
+    currentScore: 35,
+    requiredScore: 65,
+    gap: 30,
+    whyReason: 'Emerging discipline gap (-30%). Essential for next-generation automated economic census processing.',
+    reason: 'Strategic priority for automated registry data imputation and anomaly classification.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 30, roleRelevanceWeight: 25, previousLearningWeight: 14, careerRequirementWeight: 10, deptPriorityWeight: 7, emergingDemandWeight: 6 }
+  },
+  {
+    course: {
+      id: 'c-3',
+      title: 'Spatial Analytics & GIS in Government Surveys',
+      provider: 'Coursera / iGOT',
+      skill: 'GIS',
+      skillCategory: 'Technical',
+      difficulty: 'Beginner',
+      duration: '10 hours',
+      durationHours: 10,
+      rating: 4.7,
+      enrolledCount: 1150,
+      source: 'iGOT',
+      description: 'Integrate geographic information systems (GIS) with household and economic surveys. Learn QGIS, boundary shapefiles, geo-tagging validation, and spatial heatmaps.',
+      syllabus: [
+        'GIS Fundamentals and Coordinate Reference Systems in India',
+        'Geo-referencing Village & Urban Frame Survey Blocks',
+        'Spatial Sampling Verification using GeoPandas',
+        'Creating Thematic Statistical Maps for Policy Briefs'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://www.coursera.org/learn/gis',
+      status: 'active'
+    },
+    matchScore: 88,
+    priorityLevel: 'MEDIUM PRIORITY',
+    currentScore: 48,
+    requiredScore: 60,
+    gap: 12,
+    whyReason: 'Cadre requirement for digital field survey validation and village-level GIS stratification.',
+    reason: 'Supports spatial microdata verification and Urban Frame Survey (UFS) modernization.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 25, roleRelevanceWeight: 25, previousLearningWeight: 15, careerRequirementWeight: 10, deptPriorityWeight: 8, emergingDemandWeight: 5 }
+  },
+  {
+    course: {
+      id: 'c-4',
+      title: 'Government Cloud Infrastructure for Statisticians',
+      provider: 'Microsoft Learn / MeghRaj',
+      skill: 'Cloud Computing',
+      skillCategory: 'Technical',
+      difficulty: 'Beginner',
+      duration: '6 hours',
+      durationHours: 6,
+      rating: 4.8,
+      enrolledCount: 1850,
+      source: 'iGOT',
+      description: 'Architecting secure statistical data pipelines on Government Cloud (MeghRaj & Azure), S3 microdata storage, and Zero Trust access control.',
+      syllabus: [
+        'Overview of GI Cloud (MeghRaj) Ecosystem',
+        'Secure Data Storage and Encryption for Microdata',
+        'Deploying Automated Data Pipelines on Gov Cloud',
+        'Access Control, Audit Logging, and Zero-Trust Principles'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/',
+      status: 'active'
+    },
+    matchScore: 92,
+    priorityLevel: 'HIGH PRIORITY',
+    currentScore: 25,
+    requiredScore: 55,
+    gap: 30,
+    whyReason: 'Critical -30% gap detected in Cloud Computing. Modern survey pipelines mandate secure government cloud deployment.',
+    reason: 'Essential for modern microdata warehousing and MeghRaj cloud deployment.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 33, roleRelevanceWeight: 24, previousLearningWeight: 15, careerRequirementWeight: 10, deptPriorityWeight: 7, emergingDemandWeight: 7 }
+  },
+  {
+    course: {
+      id: 'c-5',
+      title: 'Advanced SQL for National Statistical Registers',
+      provider: 'Kaggle Learn / iGOT',
+      skill: 'SQL',
+      skillCategory: 'Technical',
+      difficulty: 'Advanced',
+      duration: '9 hours',
+      durationHours: 9,
+      rating: 4.8,
+      enrolledCount: 2100,
+      source: 'iGOT',
+      description: 'Master complex queries, indexing strategies, analytical window functions, and query optimization for billion-row administrative and survey datasets.',
+      syllabus: [
+        'Partitioning and Indexing Billion-Row Census Tables',
+        'Window Functions for Economic Time-Series',
+        'Data Cleansing Stored Procedures for Field Surveys',
+        'Connecting Relational Databases to Python/R Analytics'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://www.kaggle.com/learn/intro-to-sql',
+      status: 'active'
+    },
+    matchScore: 85,
+    priorityLevel: 'MEDIUM PRIORITY',
+    currentScore: 73,
+    requiredScore: 80,
+    gap: 7,
+    whyReason: 'High-speed administrative register linkage and SQL data warehousing for census verification.',
+    reason: 'Strengthens complex analytical SQL queries for national database registers.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 20, roleRelevanceWeight: 25, previousLearningWeight: 18, careerRequirementWeight: 10, deptPriorityWeight: 8, emergingDemandWeight: 4 }
+  },
+  {
+    course: {
+      id: 'c-6',
+      title: 'Modern Data Visualization with PowerBI for Public Policy',
+      provider: 'Microsoft Learn / iGOT',
+      skill: 'Data Visualization',
+      skillCategory: 'Technical',
+      difficulty: 'Intermediate',
+      duration: '7 hours',
+      durationHours: 7,
+      rating: 4.7,
+      enrolledCount: 3200,
+      source: 'iGOT',
+      description: 'Transform complex statistical tables into executive dashboards for Cabinet ministers, parliamentary committees, and public open data portals.',
+      syllabus: [
+        'DAX Calculations for Year-over-Year Inflation and Growth',
+        'Designing Accessible Dashboards adhering to GIGW Guidelines',
+        'Interactive State and District Level Drill-down Views',
+        'Automated Scheduled Refresh and PDF Report Generation'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://learn.microsoft.com/en-us/training/paths/create-use-analytics-reports-power-bi/',
+      status: 'active'
+    },
+    matchScore: 84,
+    priorityLevel: 'MEDIUM PRIORITY',
+    currentScore: 55,
+    requiredScore: 70,
+    gap: 15,
+    whyReason: 'Key dissemination skill gap (-15%) for public policy briefs and ministry dashboards.',
+    reason: 'Enables high-impact visual communication of official macroeconomic and survey metrics.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 22, roleRelevanceWeight: 24, previousLearningWeight: 16, careerRequirementWeight: 10, deptPriorityWeight: 8, emergingDemandWeight: 4 }
+  },
+  {
+    course: {
+      id: 'c-7',
+      title: 'Data Privacy & The Digital Personal Data Protection Act 2023',
+      provider: 'MeitY / iGOT',
+      skill: 'Data Privacy',
+      skillCategory: 'Digital Governance',
+      difficulty: 'Intermediate',
+      duration: '5 hours',
+      durationHours: 5,
+      rating: 4.9,
+      enrolledCount: 4100,
+      source: 'iGOT',
+      description: 'Detailed analysis of DPDP Act 2023 provisions for statistical agencies, statistical confidentiality, differential privacy algorithms, and anonymization frameworks.',
+      syllabus: [
+        'DPDP Act 2023: Rights, Obligations, and Government Exemptions',
+        'Statistical Confidentiality vs Public Dissemination',
+        'Mathematical Anonymization: k-Anonymity, l-Diversity, and t-Closeness',
+        'Differential Privacy in Census & Survey Public Microdata'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://www.meity.gov.in/data-protection-framework',
+      status: 'active'
+    },
+    matchScore: 86,
+    priorityLevel: 'MEDIUM PRIORITY',
+    currentScore: 73,
+    requiredScore: 75,
+    gap: 2,
+    whyReason: 'Legal and technical compliance with the Digital Personal Data Protection Act 2023 for statistical microdata.',
+    reason: 'Essential governance compliance for all data processing officers.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 18, roleRelevanceWeight: 28, previousLearningWeight: 15, careerRequirementWeight: 12, deptPriorityWeight: 9, emergingDemandWeight: 4 }
+  },
+  {
+    course: {
+      id: 'c-8',
+      title: 'National Accounts Statistics & SNA 2008 Implementation',
+      provider: 'NSSTA / MoSPI',
+      skill: 'National Accounts',
+      skillCategory: 'Statistical',
+      difficulty: 'Advanced',
+      duration: '14 hours',
+      durationHours: 14,
+      rating: 4.9,
+      enrolledCount: 850,
+      source: 'NSSTA',
+      description: 'Deep dive into System of National Accounts (SNA 2008), Gross Value Added (GVA) estimation, Supply and Use Tables, and GDP base revision methodologies.',
+      syllabus: [
+        'SNA 2008 Conceptual Framework and Institutional Sectors',
+        'Gross Value Added (GVA) Compilation Across 8 Economic Activities',
+        'Supply-Use Tables (SUT) and Input-Output Modeling',
+        'Revising Base Years: Price Indices, Deflators, and Chain-Linking'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://mospi.gov.in/national-accounts-division',
+      status: 'active'
+    },
+    matchScore: 91,
+    priorityLevel: 'HIGH PRIORITY',
+    currentScore: 82,
+    requiredScore: 80,
+    gap: 0,
+    whyReason: 'Core discipline for MoSPI National Accounts Division GVA and GDP quarterly estimation.',
+    reason: 'Mastery module for national economic accounting and SNA 2008 compliance.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 20, roleRelevanceWeight: 30, previousLearningWeight: 18, careerRequirementWeight: 12, deptPriorityWeight: 8, emergingDemandWeight: 3 }
+  },
+  {
+    course: {
+      id: 'c-9',
+      title: 'Advanced Survey Sampling & Estimation Techniques',
+      provider: 'NSSTA TPAC',
+      skill: 'Sampling',
+      skillCategory: 'Statistical',
+      difficulty: 'Advanced',
+      duration: '15 hours',
+      durationHours: 15,
+      rating: 4.9,
+      enrolledCount: 1600,
+      source: 'NSSTA',
+      description: 'Theory and practice of complex multi-stage sampling designs, stratified PPS sampling, design effects (DEFF), multiplier generation, and sub-sample variance estimation.',
+      syllabus: [
+        'Two-Stage Stratified Sampling Design in National Sample Surveys',
+        'Probability Proportional to Size (PPS) Selection of PSUs',
+        'Calculating Sampling Weights and Multipliers for NSS Rounds',
+        'Jackknife and Bootstrap Variance Estimation in Complex Surveys'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://unstats.un.org/unsd/methodology/surveys/',
+      status: 'active'
+    },
+    matchScore: 94,
+    priorityLevel: 'HIGH PRIORITY',
+    currentScore: 81,
+    requiredScore: 80,
+    gap: 0,
+    whyReason: 'Foundational statistical discipline for NSSO household surveys and field operations validation.',
+    reason: 'Core expertise required for official sample survey design and multiplier estimation.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 22, roleRelevanceWeight: 30, previousLearningWeight: 18, careerRequirementWeight: 12, deptPriorityWeight: 8, emergingDemandWeight: 4 }
+  },
+  {
+    course: {
+      id: 'c-10',
+      title: 'Index Numbers & Price Statistics (CPI / WPI)',
+      provider: 'MoSPI / iGOT',
+      skill: 'Statistical',
+      skillCategory: 'Statistical',
+      difficulty: 'Intermediate',
+      duration: '6 hours',
+      durationHours: 6,
+      rating: 4.8,
+      enrolledCount: 920,
+      source: 'iGOT',
+      description: 'Construction of Laspeyres, Paasche, and Fisher index numbers, Consumer Price Index (CPI) basket weighting, geometric mean aggregations, and quality adjustment.',
+      syllabus: [
+        'Axiomatic and Economic Approaches to Index Numbers',
+        'Consumer Price Index (CPI) Rural/Urban Weighting Schemes',
+        'Hedonic Quality Adjustments and Replacement Items in Price Surveys',
+        'Compiling Core Inflation and Volatility Indices'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://mospi.gov.in/cpi',
+      status: 'active'
+    },
+    matchScore: 83,
+    priorityLevel: 'MEDIUM PRIORITY',
+    currentScore: 70,
+    requiredScore: 75,
+    gap: 5,
+    whyReason: 'Monthly CPI index computation and field price quotation scrutiny.',
+    reason: 'Strengthens price collection verification and Laspeyres index compilation.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 20, roleRelevanceWeight: 25, previousLearningWeight: 16, careerRequirementWeight: 11, deptPriorityWeight: 8, emergingDemandWeight: 3 }
+  },
+  {
+    course: {
+      id: 'c-11',
+      title: 'Time Series Analysis & Seasonal Adjustment for Macroeconomic Indicators',
+      provider: 'Swayam / iGOT',
+      skill: 'Technical',
+      skillCategory: 'Statistical',
+      difficulty: 'Advanced',
+      duration: '11 hours',
+      durationHours: 11,
+      rating: 4.8,
+      enrolledCount: 670,
+      source: 'iGOT',
+      description: 'ARIMA modeling, X-13ARIMA-SEATS seasonal adjustment for official IIP and GDP series, trend-cycle extraction, and economic turning-point detection.',
+      syllabus: [
+        'Stationarity, Unit Roots, and Cointegration in Macro Series',
+        'X-13ARIMA-SEATS Seasonal Adjustment Protocol',
+        'Nowcasting Economic Indicators with High-Frequency Regressors',
+        'Calendar and Festival Effects Modeling in Indian Series'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://swayam.gov.in',
+      status: 'active'
+    },
+    matchScore: 82,
+    priorityLevel: 'MEDIUM PRIORITY',
+    currentScore: 60,
+    requiredScore: 70,
+    gap: 10,
+    whyReason: 'Seasonal adjustment and trend forecasting for Index of Industrial Production (IIP).',
+    reason: 'Advanced macro time-series analysis for quarterly economic reporting.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 20, roleRelevanceWeight: 24, previousLearningWeight: 16, careerRequirementWeight: 11, deptPriorityWeight: 8, emergingDemandWeight: 3 }
+  },
+  {
+    course: {
+      id: 'c-12',
+      title: 'Cybersecurity Essentials for Government Officers',
+      provider: 'NIC / Cyberdost / iGOT',
+      skill: 'Cybersecurity',
+      skillCategory: 'Digital Governance',
+      difficulty: 'Beginner',
+      duration: '4 hours',
+      durationHours: 4,
+      rating: 4.9,
+      enrolledCount: 5600,
+      source: 'iGOT',
+      description: 'Critical cyber hygiene, phishing prevention, secure handling of government credentials, multi-factor authentication, and incident reporting protocols.',
+      syllabus: [
+        'Government Cyber Security Guidelines & CERT-In Directives',
+        'Phishing, Social Engineering & Ransomware Defense',
+        'Secure Remote Working and NIC Email Protocols',
+        'Incident Response and Information Security Audits'
+      ],
+      thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80',
+      externalUrl: 'https://www.cisa.gov/cybersecurity-basics',
+      status: 'active'
+    },
+    matchScore: 80,
+    priorityLevel: 'LOW PRIORITY',
+    currentScore: 73,
+    requiredScore: 75,
+    gap: 2,
+    whyReason: 'Mandatory government cyber hygiene compliance for official portal access.',
+    reason: 'Essential baseline cyber protection protocol for government workstations.',
+    isEnrolled: false,
+    progress: 0,
+    breakdown: { skillGapWeight: 15, roleRelevanceWeight: 25, previousLearningWeight: 18, careerRequirementWeight: 12, deptPriorityWeight: 6, emergingDemandWeight: 4 }
+  }
+];
+
 const SAMPLE_QUIZZES: Quiz[] = [
   {
     id: 'quiz-1',
@@ -298,95 +721,7 @@ export const api = {
       `${API_BASE}/recommendations?userId=${userId}`,
       undefined,
       () => ({
-        recommendations: [
-          {
-            course: {
-              id: 'c-1',
-              title: 'Python for Statistical Data Analysis',
-              provider: 'Kaggle Learn / iGOT',
-              skill: 'Python',
-              skillCategory: 'Technical',
-              difficulty: 'Intermediate',
-              duration: '8 hours',
-              durationHours: 8,
-              rating: 4.9,
-              enrolledCount: 3420,
-              source: 'iGOT',
-              description: 'Learn data analysis with Python, Pandas, and statistical computing workflows.',
-              syllabus: ['Python Syntax', 'NumPy Vectorization', 'Pandas DataFrames', 'Statistical Modeling'],
-              thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-              externalUrl: 'https://www.kaggle.com/learn/python',
-              status: 'active'
-            },
-            matchScore: 96,
-            priorityLevel: 'HIGH PRIORITY',
-            currentScore: 42,
-            requiredScore: 75,
-            gap: 33,
-            whyReason: 'Your Python competency is 33 percentage points below the 75% benchmark required for Statistical Officers. Completing this training directly addresses your highest career gap.',
-            reason: 'Critical cadre skill gap (-33%) in statistical data analysis scripting.',
-            isEnrolled: false,
-            breakdown: { skillGapWeight: 35, roleRelevanceWeight: 25, previousLearningWeight: 15, careerRequirementWeight: 10, deptPriorityWeight: 8, emergingDemandWeight: 7 }
-          },
-          {
-            course: {
-              id: 'c-2',
-              title: 'Government Cloud Infrastructure for Statisticians',
-              provider: 'Microsoft Learn / MeghRaj',
-              skill: 'Cloud Computing',
-              skillCategory: 'Technical',
-              difficulty: 'Beginner',
-              duration: '6 hours',
-              durationHours: 6,
-              rating: 4.8,
-              enrolledCount: 1850,
-              source: 'iGOT',
-              description: 'Architecting secure statistical data pipelines on Government Cloud (MeghRaj & Azure).',
-              syllabus: ['Cloud Fundamentals', 'Microdata S3 Storage', 'Zero Trust Access', 'Disaster Recovery'],
-              thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80',
-              externalUrl: 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/',
-              status: 'active'
-            },
-            matchScore: 92,
-            priorityLevel: 'HIGH PRIORITY',
-            currentScore: 25,
-            requiredScore: 55,
-            gap: 30,
-            whyReason: 'Critical -30% gap detected in Cloud Computing. Modern survey pipelines mandate secure government cloud deployment.',
-            reason: 'Essential for modern microdata warehousing and MeghRaj cloud deployment.',
-            isEnrolled: false,
-            breakdown: { skillGapWeight: 33, roleRelevanceWeight: 24, previousLearningWeight: 15, careerRequirementWeight: 10, deptPriorityWeight: 7, emergingDemandWeight: 7 }
-          },
-          {
-            course: {
-              id: 'c-3',
-              title: 'AI & Machine Learning for Official Statistics',
-              provider: 'Google / Coursera',
-              skill: 'AI/ML',
-              skillCategory: 'Technical',
-              difficulty: 'Intermediate',
-              duration: '12 hours',
-              durationHours: 12,
-              rating: 4.9,
-              enrolledCount: 4200,
-              source: 'iGOT',
-              description: 'Applied machine learning techniques for survey data imputation and anomaly detection.',
-              syllabus: ['ML Taxonomy', 'Supervised Imputation', 'Remote Sensing', 'Model Fairness'],
-              thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&auto=format&fit=crop&q=80',
-              externalUrl: 'https://www.coursera.org/learn/machine-learning',
-              status: 'active'
-            },
-            matchScore: 89,
-            priorityLevel: 'HIGH PRIORITY',
-            currentScore: 35,
-            requiredScore: 65,
-            gap: 30,
-            whyReason: 'Emerging discipline gap (-30%). Essential for next-generation automated economic census processing.',
-            reason: 'Strategic priority for automated registry data imputation and anomaly classification.',
-            isEnrolled: false,
-            breakdown: { skillGapWeight: 30, roleRelevanceWeight: 25, previousLearningWeight: 14, careerRequirementWeight: 10, deptPriorityWeight: 7, emergingDemandWeight: 6 }
-          }
-        ]
+        recommendations: ALL_OFFICIAL_COURSES.slice(0, 3)
       })
     );
   },
@@ -416,7 +751,7 @@ export const api = {
                   externalUrl: 'https://www.kaggle.com/learn/python'
                 },
                 {
-                  id: 'c-2',
+                  id: 'c-4',
                   title: 'Government Cloud Infrastructure for Statisticians',
                   skill: 'Cloud Computing',
                   gap: 30,
@@ -433,13 +768,13 @@ export const api = {
               status: 'locked',
               courses: [
                 {
-                  id: 'c-3',
+                  id: 'c-2',
                   title: 'AI & Machine Learning for Official Statistics',
                   skill: 'AI/ML',
                   gap: 30,
                   completed: false,
                   submodules: ['1. ML Taxonomy in Stats', '2. Automated Classification (NLP)', '3. Anomaly Detection (ASI)', '4. Satellite Remote Sensing', '5. Ethical AI & Bias', '6. Practice Assessment'],
-                  externalUrl: 'https://www.coursera.org/learn/machine-learning'
+                  externalUrl: 'https://developers.google.com/machine-learning/crash-course'
                 }
               ]
             },
@@ -450,13 +785,13 @@ export const api = {
               status: 'locked',
               courses: [
                 {
-                  id: 'c-4',
-                  title: 'Modern Survey Methodology & CAPI Validation',
-                  skill: 'Survey Methodology',
+                  id: 'c-9',
+                  title: 'Advanced Survey Sampling & Estimation Techniques',
+                  skill: 'Sampling',
                   gap: 27,
                   completed: false,
                   submodules: ['1. Questionnaire Design', '2. Real-Time Logic Rules', '3. Paradata Diagnostics', '4. Field Quality Assurance'],
-                  externalUrl: 'https://www.coursera.org/learn/survey-data-collection'
+                  externalUrl: 'https://unstats.un.org/unsd/methodology/surveys/'
                 }
               ]
             },
@@ -467,13 +802,13 @@ export const api = {
               status: 'locked',
               courses: [
                 {
-                  id: 'c-5',
-                  title: 'Data Visualization & PowerBI for Public Policy',
+                  id: 'c-6',
+                  title: 'Modern Data Visualization with PowerBI for Public Policy',
                   skill: 'Data Visualization',
                   gap: 15,
                   completed: false,
                   submodules: ['1. PowerBI Data Models', '2. DAX Measures', '3. Geo-Spatial Visuals', '4. Ministry Dashboards'],
-                  externalUrl: 'https://learn.microsoft.com/en-us/training/paths/data-analytics-microsoft/'
+                  externalUrl: 'https://learn.microsoft.com/en-us/training/paths/create-use-analytics-reports-power-bi/'
                 }
               ]
             }
@@ -488,79 +823,28 @@ export const api = {
     return safeFetch(
       `${API_BASE}/igot/courses?${new URLSearchParams({ userId, ...filters })}`,
       undefined,
-      () => ({
-        courses: [
-          {
-            course: {
-              id: 'c-1',
-              title: 'Python for Statistical Data Analysis',
-              provider: 'Kaggle Learn / iGOT',
-              skill: 'Python',
-              skillCategory: 'Technical',
-              difficulty: 'Intermediate',
-              duration: '8 hours',
-              durationHours: 8,
-              rating: 4.9,
-              enrolledCount: 3420,
-              source: 'iGOT',
-              description: 'Learn data analysis with Python, Pandas, and statistical computing workflows.',
-              syllabus: ['Python Syntax', 'NumPy Vectorization', 'Pandas DataFrames', 'Statistical Modeling'],
-              thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-              externalUrl: 'https://www.kaggle.com/learn/python',
-              status: 'active'
-            },
-            matchScore: 96,
-            isEnrolled: true,
-            progress: 40
-          },
-          {
-            course: {
-              id: 'c-2',
-              title: 'Government Cloud Infrastructure for Statisticians',
-              provider: 'Microsoft Learn / MeghRaj',
-              skill: 'Cloud Computing',
-              skillCategory: 'Technical',
-              difficulty: 'Beginner',
-              duration: '6 hours',
-              durationHours: 6,
-              rating: 4.8,
-              enrolledCount: 1850,
-              source: 'iGOT',
-              description: 'Architecting secure statistical data pipelines on Government Cloud (MeghRaj & Azure).',
-              syllabus: ['Cloud Fundamentals', 'Microdata S3 Storage', 'Zero Trust Access', 'Disaster Recovery'],
-              thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80',
-              externalUrl: 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/',
-              status: 'active'
-            },
-            matchScore: 92,
-            isEnrolled: false,
-            progress: 0
-          },
-          {
-            course: {
-              id: 'c-3',
-              title: 'AI & Machine Learning for Official Statistics',
-              provider: 'Google / Coursera',
-              skill: 'AI/ML',
-              skillCategory: 'Technical',
-              difficulty: 'Intermediate',
-              duration: '12 hours',
-              durationHours: 12,
-              rating: 4.9,
-              enrolledCount: 4200,
-              source: 'iGOT',
-              description: 'Applied machine learning techniques for survey data imputation and anomaly detection.',
-              syllabus: ['ML Taxonomy', 'Supervised Imputation', 'Remote Sensing', 'Model Fairness'],
-              thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&auto=format&fit=crop&q=80',
-              externalUrl: 'https://www.coursera.org/learn/machine-learning',
-              status: 'active'
-            },
-            matchScore: 89,
-            isEnrolled: false,
-            progress: 0
-          }
-        ]
-      })
+      () => {
+        let list = [...ALL_OFFICIAL_COURSES];
+        if (filters?.skill && filters.skill !== 'all') {
+          const s = filters.skill.toLowerCase();
+          list = list.filter(item =>
+            item.course.skill.toLowerCase().includes(s) ||
+            item.course.skillCategory.toLowerCase().includes(s)
+          );
+        }
+        if (filters?.difficulty && filters.difficulty !== 'all') {
+          list = list.filter(item => item.course.difficulty.toLowerCase() === filters.difficulty!.toLowerCase());
+        }
+        if (filters?.search && filters.search.trim()) {
+          const q = filters.search.toLowerCase();
+          list = list.filter(item =>
+            item.course.title.toLowerCase().includes(q) ||
+            item.course.description.toLowerCase().includes(q) ||
+            item.course.skill.toLowerCase().includes(q)
+          );
+        }
+        return { courses: list };
+      }
     );
   },
 
@@ -1552,41 +1836,7 @@ export const api = {
       `${API_BASE}/admin/courses`,
       undefined,
       () => ({
-        courses: [
-          {
-            id: 'c-1',
-            title: 'Python for Statistical Data Analysis',
-            provider: 'Kaggle Learn / iGOT',
-            skill: 'Python',
-            difficulty: 'Intermediate',
-            duration: '8 hours',
-            externalUrl: 'https://www.kaggle.com/learn/python',
-            description: 'Comprehensive Python for statistical modeling and data cleaning.',
-            status: 'active'
-          },
-          {
-            id: 'c-2',
-            title: 'Government Cloud Infrastructure for Statisticians',
-            provider: 'Microsoft Learn / MeghRaj',
-            skill: 'Cloud Computing',
-            difficulty: 'Beginner',
-            duration: '6 hours',
-            externalUrl: 'https://learn.microsoft.com/en-us/training/paths/azure-fundamentals/',
-            description: 'Secure cloud data pipelines and microdata storage.',
-            status: 'active'
-          },
-          {
-            id: 'c-3',
-            title: 'AI & Machine Learning for Official Statistics',
-            provider: 'Google / Coursera',
-            skill: 'AI/ML',
-            difficulty: 'Intermediate',
-            duration: '12 hours',
-            externalUrl: 'https://www.coursera.org/learn/machine-learning',
-            description: 'Machine learning for automated classification and predictive imputation.',
-            status: 'active'
-          }
-        ]
+        courses: ALL_OFFICIAL_COURSES.map(item => item.course)
       })
     );
   },

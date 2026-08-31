@@ -284,6 +284,7 @@ export interface QuizAttempt {
   score?: number;
   correctCount?: number;
   incorrectCount?: number;
+  answeredCount?: number;
   unansweredCount?: number;
   totalQuestions: number;
   timeSpentSeconds?: number;
